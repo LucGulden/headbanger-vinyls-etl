@@ -3,7 +3,7 @@
  * Documentation: https://musicbrainz.org/doc/MusicBrainz_API
  */
 
-import { config } from '../config/settings.js';
+import { config } from '../../config/settings';
 
 // Types MusicBrainz
 export interface MBReleaseGroup {

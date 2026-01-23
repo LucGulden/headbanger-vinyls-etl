@@ -2,7 +2,7 @@
  * Client Spotify API (Client Credentials Flow)
  */
 
-import { config } from '../config/settings.js';
+import { config } from '../../config/settings';
 
 // Types Spotify
 export interface SpotifyToken {

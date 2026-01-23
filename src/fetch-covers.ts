@@ -12,7 +12,7 @@
  * Le script peut être interrompu avec Ctrl+C et reprendra où il en était.
  */
 
-import { validateConfig } from '../config/settings.js';
+import { validateConfig } from '../config/settings';
 import {
   getVinylsWithoutCover,
   updateVinyl,

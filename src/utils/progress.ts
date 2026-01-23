@@ -4,7 +4,7 @@
 
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
 import { dirname } from 'path';
-import { config } from '../config/settings.js';
+import { config } from '../../config/settings';
 
 export interface ProgressState {
   scriptName: string;

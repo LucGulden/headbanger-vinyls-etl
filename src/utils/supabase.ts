@@ -3,7 +3,7 @@
  */
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { config } from '../config/settings.js';
+import { config } from '../../config/settings';
 
 // Types pour la base de données FillCrate
 export interface Album {

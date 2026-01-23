@@ -3,7 +3,7 @@
  * Documentation: https://musicbrainz.org/doc/Cover_Art_Archive/API
  */
 
-import { config } from '../config/settings.js';
+import { config } from '../../config/settings';
 
 export interface CoverArtImage {
   id: string;

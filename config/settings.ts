@@ -23,7 +23,7 @@ export const config = {
   // MusicBrainz API
   musicBrainz: {
     apiBaseUrl: 'https://musicbrainz.org/ws/2',
-    userAgent: 'FillCrate/1.0.0 (contact@fillcrate.com)', // Requis par MusicBrainz
+    userAgent: 'FillCrate/0.1.0 (contact@fillcrate.com)', // Requis par MusicBrainz
     // Rate limit: 1 requête par seconde
     rateLimitMs: 1100,
   },

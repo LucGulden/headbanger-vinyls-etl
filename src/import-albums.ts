@@ -11,7 +11,7 @@
  * Le script peut être interrompu avec Ctrl+C et reprendra où il en était.
  */
 
-import { validateConfig, config } from '../config/settings.js';
+import { validateConfig, config } from '../config/settings';
 import {
   ALL_ARTISTS,
   getArtistsByPriority,
