@@ -10,7 +10,7 @@ import { getCoverUrl } from './utils/coverart.js';
 import {
   loadPipelineState,
   savePipelineState,
-  findLatestPipeline,
+  findLatestPipelines,  // ✅ Changé
   recalculateStats,
   printPipelineStats,
 } from './utils/json-store.js';
@@ -33,78 +33,90 @@ async function main() {
 
   const args = parseArgs();
 
-  let filename: string | null = null;
+  let filenames: string[] = [];  // ✅ Changé en array
+  
   if (args.file) {
-    filename = (args.file as string).replace('data/', '');
+    filenames = [(args.file as string).replace('data/', '')];
   } else if (args.latest) {
-    filename = findLatestPipeline();
-    if (!filename) { console.log('\n⚠️ Aucun fichier pipeline trouvé'); return; }
+    filenames = findLatestPipelines();  // ✅ Changé
+    if (!filenames.length) { console.log('\n⚠️ Aucun fichier pipeline trouvé'); return; }
   } else {
     console.log('\n⚠️ Utilisez --latest ou --file=...');
     return;
   }
 
-  console.log(`\n📂 Fichier: ${filename}`);
+  console.log(`\n📂 ${filenames.length} fichier(s) à traiter:\n`);
 
-  const state = loadPipelineState(filename);
-  if (!state) { console.error(`❌ Fichier non trouvé`); process.exit(1); }
+  let totalProcessed = 0;
+  let totalFound = 0;
 
-  // Collect vinyls without cover
-  const toProcess: { albumIdx: number; vinylIdx: number; releaseId: string }[] = [];
-  state.albums.forEach((album, ai) => {
-    album.vinyls.forEach((vinyl, vi) => {
-      if (!vinyl.cover_url) {
-        toProcess.push({ albumIdx: ai, vinylIdx: vi, releaseId: vinyl.musicbrainz_release_id });
-      }
+  for (const filename of filenames) {  // ✅ Boucle sur chaque fichier
+    console.log(`📂 Fichier: ${filename}`);
+
+    const state = loadPipelineState(filename);
+    if (!state) { console.error(`❌ Fichier non trouvé`); continue; }
+
+    // Collect vinyls without cover
+    const toProcess: { albumIdx: number; vinylIdx: number; releaseId: string }[] = [];
+    state.albums.forEach((album, ai) => {
+      album.vinyls.forEach((vinyl, vi) => {
+        if (!vinyl.cover_url) {
+          toProcess.push({ albumIdx: ai, vinylIdx: vi, releaseId: vinyl.musicbrainz_release_id });
+        }
+      });
     });
-  });
 
-  console.log(`   ${toProcess.length} vinyles sans cover\n`);
+    console.log(`   ${toProcess.length} vinyles sans cover`);
 
-  if (!toProcess.length) {
-    console.log('   ✅ Tous les vinyles ont une cover');
-    return;
-  }
-
-  let processed = 0;
-  let found = 0;
-
-  for (const item of toProcess) {
-    processed++;
-    const vinyl = state.albums[item.albumIdx].vinyls[item.vinylIdx];
-    const album = state.albums[item.albumIdx];
-
-    process.stdout.write(`\r   [${processed}/${toProcess.length}] ${album.spotify.artist.substring(0, 15)} - ${vinyl.title.substring(0, 20).padEnd(20)}`);
-
-    const coverUrl = await getCoverUrl(item.releaseId);
-    if (coverUrl) {
-      vinyl.cover_url = coverUrl;
-      found++;
+    if (!toProcess.length) {
+      console.log('   ✅ Tous les vinyles ont une cover\n');
+      continue;
     }
 
-    if (processed % 50 === 0) {
-      recalculateStats(state);
-      savePipelineState(filename, state);
+    let processed = 0;
+    let found = 0;
+
+    for (const item of toProcess) {
+      processed++;
+      const vinyl = state.albums[item.albumIdx].vinyls[item.vinylIdx];
+      const album = state.albums[item.albumIdx];
+
+      process.stdout.write(`\r   [${processed}/${toProcess.length}] ${album.spotify.artist.substring(0, 15)} - ${vinyl.title.substring(0, 20).padEnd(20)}`);
+
+      const coverUrl = await getCoverUrl(item.releaseId);
+      if (coverUrl) {
+        vinyl.cover_url = coverUrl;
+        found++;
+      }
+
+      if (processed % 50 === 0) {
+        recalculateStats(state);
+        savePipelineState(filename, state);
+      }
     }
-  }
 
-  // Update status
-  for (const album of state.albums) {
-    if (album.status === 'enriched_mb' && album.vinyls.some(v => v.cover_url)) {
-      album.status = 'enriched_covers';
+    // Update status
+    for (const album of state.albums) {
+      if (album.status === 'enriched_mb' && album.vinyls.some(v => v.cover_url)) {
+        album.status = 'enriched_covers';
+      }
     }
+
+    state.phase = 'enrich_covers';
+    recalculateStats(state);
+    savePipelineState(filename, state);
+
+    console.log('\n');
+    console.log(`   ✅ Covers trouvées: ${found}/${toProcess.length}\n`);
+
+    printPipelineStats(state);
+
+    totalProcessed += processed;
+    totalFound += found;
   }
-
-  state.phase = 'enrich_covers';
-  recalculateStats(state);
-  savePipelineState(filename, state);
-
-  console.log('\n');
-  console.log(`   ✅ Covers trouvées: ${found}/${toProcess.length}`);
-
-  printPipelineStats(state);
 
   console.log('\n✨ Terminé!');
+  console.log(`   📊 Total: ${totalFound} covers trouvées`);
   console.log('   Prochaine étape: npm run load -- --latest');
 }
 

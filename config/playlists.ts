@@ -65,11 +65,19 @@ export const LATIN_PLAYLISTS: PlaylistConfig[] = [
 ];
 
 export const COUNTRY_PLAYLISTS: PlaylistConfig[] = [
-  // À ajouter - playlists publiques fiables à identifier
+  { id: '7ot6fpKqnafbgXDLU9kLNC', name: 'Country 2025', description: 'Country Music Updated Weekly', genre: 'country', priority: 'high', owner: 'Ryan Robinette' },
+  { id: '4Jb4PDWREzNnbZcOHPcZPy', name: 'COUNTRY HITS 2026', description: 'New Country Songs + Top Hits', genre: 'country', priority: 'high', owner: 'Spot' },
+  { id: '5zpfd3EQLZ41uqmz9xawXT', name: 'Country Songs 2025', description: 'New Country Music', genre: 'country', priority: 'high', owner: 'Filtr US' },
+  { id: '5KGrydUgLPDnSQcPpHBJFE', name: 'Country Mix 2025', description: 'Mix de country 2025', genre: 'country', priority: 'high', owner: 'RIGHT NOW!' },
+  { id: '7Cg5wKZ98CTB0DNvvFpyWA', name: 'Country Radio 2025', description: 'Country Radio', genre: 'country', priority: 'high', owner: 'Country Hits Group' },
 ];
 
 export const BLUES_PLAYLISTS: PlaylistConfig[] = [
-  // À ajouter - playlists publiques fiables à identifier
+  { id: '4SSYVPgIuhSuBg8fpi7FL4', name: 'New Blues 2026', description: 'New Blues Music 2026', genre: 'blues', priority: 'high', owner: 'hen.ry' },
+  { id: '4COlZYiyA7rr4WITkr3OLU', name: 'Modern Blues (2025 Radar)', description: 'Modern Blues Music', genre: 'blues', priority: 'high', owner: 'Lullify Music Group' },
+  { id: '3aHFHMTECsMvzCIGOlF4iU', name: 'Blues Music 2026', description: 'Best Blues Songs 2026', genre: 'blues', priority: 'high', owner: 'Redlist - Global Sounds' },
+  { id: '5vcRlhHan9zEqcsNYAN8GT', name: 'Southern Soul Blues Mix 2024', description: 'Southern Soul Blues', genre: 'blues', priority: 'high', owner: 'rquick1202' },
+  { id: '0tjx9gft8Jdcev5UOQZM1c', name: 'Blues top 1000 all time', description: 'Blues 2024 & Rhythm', genre: 'blues', priority: 'high', owner: 'rockingmonkey' },
 ];
 
 export const ALL_PLAYLISTS: PlaylistConfig[] = [

@@ -12,7 +12,7 @@ import { loadAlbumWithVinyls } from './utils/supabase.js';
 import {
   loadPipelineState,
   savePipelineState,
-  findLatestPipeline,
+  findLatestPipelines,  // ✅ Changé
   recalculateStats,
   printPipelineStats,
 } from './utils/json-store.js';
@@ -44,87 +44,113 @@ async function main() {
     try { validateSupabaseConfig(); } catch (e) { console.error(`\n❌ ${(e as Error).message}`); process.exit(1); }
   }
 
-  let filename: string | null = null;
+  let filenames: string[] = [];  // ✅ Changé en array
+  
   if (args.file) {
-    filename = (args.file as string).replace('data/', '');
+    filenames = [(args.file as string).replace('data/', '')];
   } else if (args.latest) {
-    filename = findLatestPipeline();
-    if (!filename) { console.log('\n⚠️ Aucun fichier pipeline trouvé'); return; }
+    filenames = findLatestPipelines();  // ✅ Changé
+    if (!filenames.length) { console.log('\n⚠️ Aucun fichier pipeline trouvé'); return; }
   } else {
     console.log('\n⚠️ Utilisez --latest ou --file=...');
     return;
   }
 
-  console.log(`\n📂 Fichier: ${filename}`);
-
-  const state = loadPipelineState(filename);
-  if (!state) { console.error(`❌ Fichier non trouvé`); process.exit(1); }
-
-  // Filter albums with vinyls
-  const toLoad = state.albums.filter(a =>
-    a.vinyls.length > 0 &&
-    a.musicbrainz &&
-    (a.status === 'enriched_mb' || a.status === 'enriched_covers')
-  );
-
-  const totalVinyls = toLoad.reduce((sum, a) => sum + a.vinyls.length, 0);
-
-  console.log(`   ${toLoad.length} albums à charger (${totalVinyls} vinyles)`);
+  console.log(`\n📂 ${filenames.length} fichier(s) à charger:\n`);
 
   if (dryRun) {
-    console.log('\n   🔍 MODE DRY-RUN\n');
-    for (const album of toLoad.slice(0, 10)) {
-      console.log(`      • ${album.spotify.artist} - ${album.spotify.title}`);
-      console.log(`        ${album.vinyls.length} vinyle(s): ${album.vinyls.map(v => v.country).join(', ')}`);
-    }
-    if (toLoad.length > 10) console.log(`      ... et ${toLoad.length - 10} autres`);
-    return;
+    console.log('🔍 MODE DRY-RUN\n');
   }
 
-  console.log('\n');
+  let totalProcessed = 0;
+  let totalAlbumsLoaded = 0;
+  let totalVinylsLoaded = 0;
+  let totalErrors = 0;
 
-  let processed = 0;
-  let albumsLoaded = 0;
-  let vinylsLoaded = 0;
-  let errors = 0;
+  for (const filename of filenames) {  // ✅ Boucle sur chaque fichier
+    console.log(`📂 Fichier: ${filename}`);
 
-  for (const album of toLoad) {
-    processed++;
-    process.stdout.write(`\r   [${processed}/${toLoad.length}] ${album.spotify.artist.substring(0, 15)} - ${album.spotify.title.substring(0, 20).padEnd(20)}`);
+    const state = loadPipelineState(filename);
+    if (!state) { console.error(`❌ Fichier non trouvé`); continue; }
 
-    try {
-      const result = await loadAlbumWithVinyls(album);
-      if (result) {
-        albumsLoaded++;
-        vinylsLoaded += result.vinylCount;
-        album.status = 'loaded';
+    // Filter albums with vinyls
+    const toLoad = state.albums.filter(a =>
+      a.vinyls.length > 0 &&
+      a.musicbrainz &&
+      (a.status === 'enriched_mb' || a.status === 'enriched_covers')
+    );
+
+    const totalVinyls = toLoad.reduce((sum, a) => sum + a.vinyls.length, 0);
+
+    console.log(`   ${toLoad.length} albums à charger (${totalVinyls} vinyles)`);
+
+    if (dryRun) {
+      console.log('');
+      for (const album of toLoad.slice(0, 10)) {
+        console.log(`      • ${album.spotify.artist} - ${album.spotify.title}`);
+        console.log(`        ${album.vinyls.length} vinyle(s): ${album.vinyls.map(v => v.country).join(', ')}`);
       }
-    } catch (e) {
-      errors++;
-      console.log(`\n   ⚠️ ${(e as Error).message}`);
+      if (toLoad.length > 10) console.log(`      ... et ${toLoad.length - 10} autres`);
+      console.log('');
+      continue;  // ✅ Skip actual loading
     }
 
-    if (processed % 20 === 0) {
-      recalculateStats(state);
-      savePipelineState(filename, state);
+    console.log('');
+
+    let processed = 0;
+    let albumsLoaded = 0;
+    let vinylsLoaded = 0;
+    let errors = 0;
+
+    for (const album of toLoad) {
+      processed++;
+      process.stdout.write(`\r   [${processed}/${toLoad.length}] ${album.spotify.artist.substring(0, 15)} - ${album.spotify.title.substring(0, 20).padEnd(20)}`);
+
+      try {
+        const result = await loadAlbumWithVinyls(album);
+        if (result) {
+          albumsLoaded++;
+          vinylsLoaded += result.vinylCount;
+          album.status = 'loaded';
+        }
+      } catch (e) {
+        errors++;
+        console.log(`\n   ⚠️ ${(e as Error).message}`);
+      }
+
+      if (processed % 20 === 0) {
+        recalculateStats(state);
+        savePipelineState(filename, state);
+      }
+
+      await sleep(50);
     }
 
-    await sleep(50);
+    state.phase = 'complete';
+    recalculateStats(state);
+    savePipelineState(filename, state);
+
+    console.log('\n');
+    console.log(`   ✅ Chargement terminé`);
+    console.log(`      Albums: ${albumsLoaded}`);
+    console.log(`      Vinyles: ${vinylsLoaded}`);
+    if (errors) console.log(`      Erreurs: ${errors}`);
+
+    printPipelineStats(state);
+
+    totalProcessed += processed;
+    totalAlbumsLoaded += albumsLoaded;
+    totalVinylsLoaded += vinylsLoaded;
+    totalErrors += errors;
+
+    console.log('');
   }
 
-  state.phase = 'complete';
-  recalculateStats(state);
-  savePipelineState(filename, state);
-
-  console.log('\n');
-  console.log(`   ✅ Chargement terminé`);
-  console.log(`      Albums: ${albumsLoaded}`);
-  console.log(`      Vinyles: ${vinylsLoaded}`);
-  if (errors) console.log(`      Erreurs: ${errors}`);
-
-  printPipelineStats(state);
-
-  console.log('\n✨ Pipeline terminé!');
+  if (!dryRun) {
+    console.log('✨ Pipeline terminé!');
+    console.log(`   📊 Total: ${totalAlbumsLoaded} albums, ${totalVinylsLoaded} vinyles chargés`);
+    if (totalErrors) console.log(`   ⚠️ Erreurs: ${totalErrors}`);
+  }
 }
 
 main().catch(e => { console.error('\n💥', e); process.exit(1); });

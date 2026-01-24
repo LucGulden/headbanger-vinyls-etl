@@ -514,6 +514,7 @@ export const SOUL_RNB: ArtistConfig[] = [
   { name: 'Frank Ocean', priority: 'high', genre: 'rnb', subGenre: '2010s' },
   { name: 'The Weeknd', priority: 'high', genre: 'rnb', subGenre: '2010s' },
   { name: 'SZA', priority: 'high', genre: 'rnb', subGenre: '2010s' },
+  { name: 'Jorja Smith', priority: 'high', genre: 'rnb', subGenre: '2010s' },
   { name: 'Solange', priority: 'medium', genre: 'rnb', subGenre: '2010s' },
   { name: 'Steve Lacy', priority: 'high', genre: 'rnb', subGenre: '2020s' },
   { name: 'Giveon', priority: 'medium', genre: 'rnb', subGenre: '2020s' },

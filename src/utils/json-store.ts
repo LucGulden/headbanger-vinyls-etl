@@ -40,11 +40,26 @@ export function listPipelineFiles(): string[] {
   return readdirSync(DATA_DIR).filter(f => f.startsWith('pipeline_') && f.endsWith('.json'));
 }
 
-export function findLatestPipeline(source?: string): string | null {
-  let files = listPipelineFiles();
-  if (source) files = files.filter(f => f.includes(`_${source}_`));
-  if (files.length === 0) return null;
-  return files.sort().reverse()[0];
+export function findLatestPipelines(): string[] {
+  const files = listPipelineFiles();
+  if (files.length === 0) return [];
+  
+  // Extract dates from filenames: pipeline_source_details_DATE.json
+  const filesWithDates = files.map(f => {
+    const match = f.match(/(\d{4}-\d{2}-\d{2})\.json$/);
+    const date = match ? match[1] : '';
+    return { file: f, date };
+  });
+  
+  // Find the most recent date
+  const latestDate = filesWithDates.sort((a, b) => b.date.localeCompare(a.date))[0]?.date;
+  if (!latestDate) return [];
+  
+  // Return all files from the latest date
+  return filesWithDates
+    .filter(item => item.date === latestDate)
+    .map(item => item.file)
+    .sort();
 }
 
 // =============================================================================
