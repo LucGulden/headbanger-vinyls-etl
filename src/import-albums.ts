@@ -14,6 +14,7 @@
  *   npm run import:albums -- --priority=high
  *   npm run import:albums -- --genre=rap-fr
  *   npm run import:albums -- --artist="Nas"
+ *   npm run import:albums -- --all           (traiter artistes + playlists)
  *   npm run import:albums -- --clear         (recommencer à zéro)
  *
  * Le script peut être interrompu avec Ctrl+C et reprendra où il en était.
@@ -23,26 +24,26 @@ import { validateConfig } from '../config/settings.js';
 import {
   ALL_ARTISTS,
   getArtistsByPriority,
-  getArtistsByGenre,
   type ArtistConfig,
 } from '../config/artists.js';
 import { TEST_ARTISTS } from '../config/artists-test.js';
+import { ALL_PLAYLISTS } from '../config/playlists.js';
 import {
   searchArtist,
   getArtistAlbums,
-  spotifyAlbumToDbAlbum,
-  type SpotifyAlbum,
+  getPlaylistAlbums,
 } from './utils/spotify.js';
+import type { SpotifyAlbumData } from './utils/types.js';
 import {
-  searchReleaseGroups,
-  type MBReleaseGroup,
+  searchReleaseGroup,
 } from './utils/musicbrainz.js';
-import { upsertAlbum, findAlbumBySpotifyId, findAlbumByMusicBrainzId } from './utils/supabase.js';
+import { insertAlbum, albumExists } from './utils/supabase.js';
 import {
   runWithProgress,
   clearProgress,
   logError,
 } from './utils/progress.js';
+import type { PlaylistConfig } from './utils/types.js';
 
 const SCRIPT_NAME = 'import-albums';
 
@@ -95,6 +96,7 @@ function parseArgs(): {
   clear?: boolean;
   test?: boolean;
   albumsOnly?: boolean;
+  all?: boolean;
 } {
   const args: Record<string, string | boolean> = {};
 
@@ -164,8 +166,13 @@ function normalizeForMBSearch(text: string): string {
 // RECHERCHE MUSICBRAINZ
 // =============================================================================
 
+interface MBReleaseGroup {
+  id: string;
+  title: string;
+}
+
 interface AlbumWithMB {
-  spotifyAlbum: SpotifyAlbum;
+  spotifyAlbum: SpotifyAlbumData;
   mbReleaseGroup: MBReleaseGroup;
 }
 
@@ -180,19 +187,8 @@ async function findMBReleaseGroup(
   const searchTitle = normalizeForMBSearch(albumTitle);
 
   try {
-    const releaseGroups = await searchReleaseGroups(searchArtist, searchTitle);
-
-    if (releaseGroups.length === 0) {
-      return null;
-    }
-
-    // Chercher une correspondance exacte sur le titre normalisé
-    const normalizedSearch = normalizeTitle(albumTitle);
-    const exactMatch = releaseGroups.find(
-      (rg) => normalizeTitle(rg.title) === normalizedSearch
-    );
-
-    return exactMatch || releaseGroups[0];
+    const result = await searchReleaseGroup(searchArtist, searchTitle);
+    return result;
   } catch (error) {
     console.log(`      ⚠️  Erreur MB: ${(error as Error).message}`);
     return null;
@@ -230,9 +226,9 @@ function mergeAlbumsByReleaseGroup(albums: AlbumWithMB[]): AlbumWithMB[] {
       const kept = group[0];
       const discarded = group.slice(1);
 
-      console.log(`      🔀 Fusion: "${kept.spotifyAlbum.name}" (${kept.spotifyAlbum.release_date.split('-')[0]})`);
+      console.log(`      🔀 Fusion: "${kept.spotifyAlbum.title}" (${kept.spotifyAlbum.release_date.split('-')[0]})`);
       for (const d of discarded) {
-        console.log(`         ↳ absorbe "${d.spotifyAlbum.name}" (${d.spotifyAlbum.release_date.split('-')[0]})`);
+        console.log(`         ↳ absorbe "${d.spotifyAlbum.title}" (${d.spotifyAlbum.release_date.split('-')[0]})`);
       }
 
       merged.push(kept);
@@ -296,15 +292,15 @@ async function processArtist(
   const albumsWithMB: AlbumWithMB[] = [];
 
   for (const album of uniqueAlbums) {
-    const artistName = album.artists[0]?.name || artistConfig.name;
-    const mbReleaseGroup = await findMBReleaseGroup(artistName, album.name);
+    const artistName = album.artist || artistConfig.name;
+    const mbReleaseGroup = await findMBReleaseGroup(artistName, album.title);
 
     if (mbReleaseGroup) {
       albumsWithMB.push({ spotifyAlbum: album, mbReleaseGroup });
     } else {
       failureReport.albumsNoMBMatch.push({
         artist: artistConfig.name,
-        album: album.name,
+        album: album.title,
       });
     }
 
@@ -330,10 +326,9 @@ async function processArtist(
   for (const { spotifyAlbum, mbReleaseGroup } of mergedAlbums) {
     try {
       // Vérifier si déjà en base (par Spotify ID ou MB ID)
-      const existingBySpotify = await findAlbumBySpotifyId(spotifyAlbum.id);
-      const existingByMB = await findAlbumByMusicBrainzId(mbReleaseGroup.id);
+      const existing = await albumExists(spotifyAlbum.spotify_id, mbReleaseGroup.id);
 
-      if (existingBySpotify || existingByMB) {
+      if (existing) {
         skipped++;
         failureReport.stats.albumsSkipped++;
         continue;
@@ -341,11 +336,11 @@ async function processArtist(
 
       // Convertir et insérer
       const dbAlbum = {
-        ...spotifyAlbumToDbAlbum(spotifyAlbum),
+        ...spotifyAlbum,
         musicbrainz_release_group_id: mbReleaseGroup.id,
       };
 
-      await upsertAlbum(dbAlbum);
+      await insertAlbum(dbAlbum);
       inserted++;
       failureReport.stats.albumsInserted++;
 
@@ -355,8 +350,8 @@ async function processArtist(
       logError(
         SCRIPT_NAME,
         'insert-album',
-        spotifyAlbum.id,
-        `${spotifyAlbum.artists[0]?.name} - ${spotifyAlbum.name}`,
+        spotifyAlbum.spotify_id,
+        `${spotifyAlbum.artist} - ${spotifyAlbum.title}`,
         error as Error
       );
     }
@@ -372,12 +367,12 @@ async function processArtist(
  * Déduplique les albums Spotify (même nom = même album)
  * Garde la version la plus ancienne (originale)
  */
-function deduplicateSpotifyAlbums(albums: SpotifyAlbum[]): SpotifyAlbum[] {
-  const seen = new Map<string, SpotifyAlbum>();
+function deduplicateSpotifyAlbums(albums: SpotifyAlbumData[]): SpotifyAlbumData[] {
+  const seen = new Map<string, SpotifyAlbumData>();
 
   for (const album of albums) {
     // Clé de déduplication: nom normalisé + type
-    const key = `${normalizeTitle(album.name)}-${album.album_type}`;
+    const key = `${normalizeTitle(album.title)}-${album.album_type}`;
 
     const existing = seen.get(key);
     if (!existing) {
@@ -394,6 +389,109 @@ function deduplicateSpotifyAlbums(albums: SpotifyAlbum[]): SpotifyAlbum[] {
   }
 
   return Array.from(seen.values());
+}
+
+// =============================================================================
+// TRAITEMENT D'UNE PLAYLIST
+// =============================================================================
+
+async function processPlaylist(
+  playlistConfig: PlaylistConfig,
+  index: number,
+  total: number
+): Promise<'success' | 'skipped' | 'error'> {
+  console.log(`\n[${index + 1}/${total}] 📻 ${playlistConfig.name}`);
+
+  // 1. Récupérer les albums de la playlist
+  console.log(`   🔍 Récupération des albums depuis la playlist...`);
+  const albums = await getPlaylistAlbums(playlistConfig.id);
+
+  console.log(`   📀 ${albums.length} albums trouvés`);
+
+  if (albums.length === 0) {
+    return 'skipped';
+  }
+
+  // 2. Dédupliquer les albums
+  const uniqueAlbums = deduplicateSpotifyAlbums(albums);
+  console.log(`   📀 ${uniqueAlbums.length} albums uniques`);
+
+  failureReport.stats.totalAlbumsProcessed += uniqueAlbums.length;
+
+  // 3. Pour chaque album, chercher correspondance MusicBrainz
+  console.log(`   🔍 Recherche MusicBrainz...`);
+
+  const albumsWithMB: AlbumWithMB[] = [];
+
+  for (const album of uniqueAlbums) {
+    const mbReleaseGroup = await findMBReleaseGroup(album.artist, album.title);
+
+    if (mbReleaseGroup) {
+      albumsWithMB.push({ spotifyAlbum: album, mbReleaseGroup });
+    } else {
+      failureReport.albumsNoMBMatch.push({
+        artist: album.artist,
+        album: album.title,
+      });
+    }
+
+    // Rate limiting MusicBrainz
+    await sleep(1100);
+  }
+
+  console.log(`   ✓ ${albumsWithMB.length}/${uniqueAlbums.length} avec correspondance MB`);
+  failureReport.stats.albumsWithMB += albumsWithMB.length;
+
+  if (albumsWithMB.length === 0) {
+    return 'skipped';
+  }
+
+  // 4. Fusionner les albums qui pointent vers le même Release Group
+  const mergedAlbums = mergeAlbumsByReleaseGroup(albumsWithMB);
+  console.log(`   📀 ${mergedAlbums.length} albums après fusion`);
+
+  // 5. Insérer en base
+  let inserted = 0;
+  let skipped = 0;
+
+  for (const { spotifyAlbum, mbReleaseGroup } of mergedAlbums) {
+    try {
+      // Vérifier si déjà en base (par Spotify ID ou MB ID)
+      const existing = await albumExists(spotifyAlbum.spotify_id, mbReleaseGroup.id);
+
+      if (existing) {
+        skipped++;
+        failureReport.stats.albumsSkipped++;
+        continue;
+      }
+
+      // Convertir et insérer
+      const dbAlbum = {
+        ...spotifyAlbum,
+        musicbrainz_release_group_id: mbReleaseGroup.id,
+      };
+
+      await insertAlbum(dbAlbum);
+      inserted++;
+      failureReport.stats.albumsInserted++;
+
+      // Petit délai pour éviter de surcharger Supabase
+      await sleep(50);
+    } catch (error) {
+      logError(
+        SCRIPT_NAME,
+        'insert-album',
+        spotifyAlbum.spotify_id,
+        `${spotifyAlbum.artist} - ${spotifyAlbum.title}`,
+        error as Error
+      );
+    }
+  }
+
+  console.log(`   ✅ ${inserted} insérés, ${skipped} déjà présents`);
+
+  failureReport.stats.successArtists++;
+  return 'success';
 }
 
 // =============================================================================
@@ -489,24 +587,62 @@ async function main() {
   // Filtrer les artistes
   const artists = filterArtists(args);
 
-  if (artists.length === 0) {
+  if (artists.length === 0 && !args.all) {
     console.log('\n⚠️  Aucun artiste correspondant aux filtres.');
     process.exit(0);
   }
 
-  console.log(`\n📊 ${artists.length} artistes à traiter`);
-  console.log('📝 Seuls les albums avec correspondance MusicBrainz seront importés');
+  // Mode "all": traiter à la fois les artistes et les playlists
+  if (args.all) {
+    console.log(`\n📊 Mode ALL: ${artists.length} artistes + ${ALL_PLAYLISTS.length} playlists à traiter`);
+    console.log('📝 Seuls les albums avec correspondance MusicBrainz seront importés');
 
-  // Lancer l'import avec gestion de la progression
-  await runWithProgress(
-    SCRIPT_NAME,
-    artists,
-    'import-artists-with-mb',
-    (artist) => artist.name,
-    async (artist, index) => {
-      return processArtist(artist, index, artists.length, args.albumsOnly ?? false);
+    // 1. Traiter les artistes
+    if (artists.length > 0) {
+      console.log(`\n\n${'='.repeat(70)}`);
+      console.log('   TRAITEMENT DES ARTISTES');
+      console.log('='.repeat(70));
+
+      await runWithProgress(
+        SCRIPT_NAME,
+        artists,
+        'import-artists-with-mb',
+        (artist) => artist.name,
+        async (artist, index) => {
+          return processArtist(artist, index, artists.length, args.albumsOnly ?? false);
+        }
+      );
     }
-  );
+
+    // 2. Traiter les playlists
+    console.log(`\n\n${'='.repeat(70)}`);
+    console.log('   TRAITEMENT DES PLAYLISTS');
+    console.log('='.repeat(70));
+
+    await runWithProgress(
+      SCRIPT_NAME,
+      ALL_PLAYLISTS,
+      'import-playlists-with-mb',
+      (playlist) => playlist.name,
+      async (playlist, index) => {
+        return processPlaylist(playlist, index, ALL_PLAYLISTS.length);
+      }
+    );
+  } else {
+    // Mode normal: traiter seulement les artistes
+    console.log(`\n📊 ${artists.length} artistes à traiter`);
+    console.log('📝 Seuls les albums avec correspondance MusicBrainz seront importés');
+
+    await runWithProgress(
+      SCRIPT_NAME,
+      artists,
+      'import-artists-with-mb',
+      (artist) => artist.name,
+      async (artist, index) => {
+        return processArtist(artist, index, artists.length, args.albumsOnly ?? false);
+      }
+    );
+  }
 
   // Afficher le récap
   printFailureReport();

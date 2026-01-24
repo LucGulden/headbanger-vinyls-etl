@@ -136,12 +136,28 @@ async function main() {
   }
 
   // Artist modes
-  let artists: ArtistConfig[] = [];
-  let sourceDetails = 'rap';
   const albumsOnly = !!args.albumsOnly;
 
+  // Mode --all: traiter artistes + playlists + new releases
+  if (args.all) {
+    console.log(`\n📊 Mode ALL: ${ALL_ARTISTS.length} artistes + ${ALL_PLAYLISTS.length} playlists`);
+
+    // 1. Extraction depuis les artistes
+    await extractFromArtists(ALL_ARTISTS, 'all-artists', albumsOnly);
+
+    // 2. Extraction depuis les playlists
+    await extractFromPlaylists(ALL_PLAYLISTS, 'all-playlists');
+
+    console.log('\n✨ Extraction terminée!');
+    console.log('   Prochaine étape: npm run enrich:mb -- --latest');
+    return;
+  }
+
+  // Mode normal: traiter les artistes uniquement
+  let artists: ArtistConfig[] = [];
+  let sourceDetails = 'rap';
+
   if (args.test) { artists = TEST_ARTISTS; sourceDetails = 'test'; }
-  else if (args.all) { artists = ALL_ARTISTS; sourceDetails = 'all'; }
   else { artists = ALL_ARTISTS; sourceDetails = 'rap'; }
 
   if (args.genre) {
@@ -155,7 +171,7 @@ async function main() {
   }
 
   if (!artists.length) {
-    console.log('\n⚠️ Options: --test, --artists, --all, --genre=X, --playlist=ID');
+    console.log('\n⚠️ Options: --test, --all, --genre=X, --priority=X, --playlist=ID, --new-releases');
     return;
   }
 

@@ -72,6 +72,9 @@ npm run import:full -- --artists
 # Tous les genres
 npm run import:full -- --all
 
+# Tous les genres et singles exclus
+npm run import:full -- --all --albums-only
+
 # Depuis une playlist
 npm run import:full -- --playlist=37i9dQZF1DX0XUsuxWHRQd
 ```

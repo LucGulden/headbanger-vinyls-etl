@@ -1,5 +1,5 @@
 /**
- * Liste des artistes
+ * Liste des artistes - Version enrichie
  */
 
 import type { ArtistConfig } from '../src/utils/types.js';
@@ -176,10 +176,15 @@ export const RAP_US_EXTENDED: ArtistConfig[] = [
   { name: 'Little Simz', priority: 'high', genre: 'rap-uk', subGenre: 'modern' },
   { name: 'Central Cee', priority: 'high', genre: 'rap-uk', subGenre: 'drill' },
   { name: 'Skepta', priority: 'high', genre: 'rap-uk', subGenre: 'grime' },
+  { name: 'Wiley', priority: 'high', genre: 'rap-uk', subGenre: 'grime' },
+  { name: 'Stormzy', priority: 'high', genre: 'rap-uk', subGenre: 'grime' },
+  { name: 'Dizzee Rascal', priority: 'high', genre: 'rap-uk', subGenre: 'grime' },
+  { name: 'Bugzy Malone', priority: 'medium', genre: 'rap-uk', subGenre: 'manchester' },
+  { name: 'Giggs', priority: 'medium', genre: 'rap-uk', subGenre: 'uk-hip-hop' },
 ];
 
 // =============================================================================
-// RAP FR
+// RAP FR - CLASSIC
 // =============================================================================
 
 export const RAP_FR_CLASSIC: ArtistConfig[] = [
@@ -310,7 +315,84 @@ export const RAP_BE_CH: ArtistConfig[] = [
 ];
 
 // =============================================================================
-// ROCK
+// PUNK
+// =============================================================================
+
+export const PUNK: ArtistConfig[] = [
+  { name: 'The Ramones', priority: 'high', genre: 'punk', subGenre: 'classic' },
+  { name: 'Sex Pistols', priority: 'high', genre: 'punk', subGenre: 'classic' },
+  { name: 'The Clash', priority: 'high', genre: 'punk', subGenre: 'classic' },
+  { name: 'Dead Kennedys', priority: 'high', genre: 'punk', subGenre: 'classic' },
+  { name: 'Black Flag', priority: 'high', genre: 'punk', subGenre: 'hardcore' },
+  { name: 'Minor Threat', priority: 'high', genre: 'punk', subGenre: 'hardcore' },
+  { name: 'Bad Brains', priority: 'high', genre: 'punk', subGenre: 'hardcore' },
+  { name: 'The Damned', priority: 'medium', genre: 'punk', subGenre: 'classic' },
+  { name: 'Buzzcocks', priority: 'medium', genre: 'punk', subGenre: 'post-punk' },
+  { name: 'Wire', priority: 'medium', genre: 'punk', subGenre: 'post-punk' },
+  { name: 'Television', priority: 'medium', genre: 'punk', subGenre: 'proto-punk' },
+  { name: 'The New York Dolls', priority: 'medium', genre: 'punk', subGenre: 'proto-punk' },
+  { name: 'Green Day', priority: 'high', genre: 'punk', subGenre: 'pop-punk' },
+  { name: 'Blink-182', priority: 'high', genre: 'punk', subGenre: 'pop-punk' },
+  { name: 'The Offspring', priority: 'medium', genre: 'punk', subGenre: 'pop-punk' },
+  { name: 'Sum 41', priority: 'medium', genre: 'punk', subGenre: 'pop-punk' },
+];
+
+// =============================================================================
+// FUNK
+// =============================================================================
+
+export const FUNK: ArtistConfig[] = [
+  { name: 'James Brown', priority: 'high', genre: 'funk', subGenre: 'classic' },
+  { name: 'George Clinton', priority: 'high', genre: 'funk', subGenre: 'classic' },
+  { name: 'Parliament', priority: 'high', genre: 'funk', subGenre: 'classic' },
+  { name: 'Funkadelic', priority: 'high', genre: 'funk', subGenre: 'classic' },
+  { name: 'Earth, Wind & Fire', priority: 'high', genre: 'funk', subGenre: 'classic' },
+  { name: 'Kool & The Gang', priority: 'medium', genre: 'funk', subGenre: 'classic' },
+  { name: 'Herbie Hancock', priority: 'high', genre: 'funk', subGenre: 'jazz-funk' },
+  { name: 'The Meters', priority: 'high', genre: 'funk', subGenre: 'classic' },
+  { name: 'Bootsy Collins', priority: 'high', genre: 'funk', subGenre: 'classic' },
+  { name: 'Zapp & Roger', priority: 'medium', genre: 'funk', subGenre: 'electro-funk' },
+  { name: 'Midnight Star', priority: 'medium', genre: 'funk', subGenre: 'electro-funk' },
+];
+
+// =============================================================================
+// DISCO
+// =============================================================================
+
+export const DISCO: ArtistConfig[] = [
+  { name: 'Bee Gees', priority: 'high', genre: 'disco', subGenre: 'classic' },
+  { name: 'Donna Summer', priority: 'high', genre: 'disco', subGenre: 'classic' },
+  { name: 'KC & The Sunshine Band', priority: 'high', genre: 'disco', subGenre: 'classic' },
+  { name: 'Gloria Gaynor', priority: 'high', genre: 'disco', subGenre: 'classic' },
+  { name: 'Village People', priority: 'high', genre: 'disco', subGenre: 'classic' },
+  { name: 'Chic', priority: 'high', genre: 'disco', subGenre: 'classic' },
+  { name: 'Nile Rodgers', priority: 'high', genre: 'disco', subGenre: 'classic' },
+  { name: 'Sister Sledge', priority: 'medium', genre: 'disco', subGenre: 'classic' },
+  { name: 'Rose Royce', priority: 'medium', genre: 'disco', subGenre: 'classic' },
+  { name: 'The Trammps', priority: 'medium', genre: 'disco', subGenre: 'classic' },
+];
+
+// =============================================================================
+// REGGAETON / LATIN
+// =============================================================================
+
+export const REGGAETON_LATIN: ArtistConfig[] = [
+  { name: 'Daddy Yankee', priority: 'high', genre: 'reggaeton', subGenre: 'classic' },
+  { name: 'Don Omar', priority: 'high', genre: 'reggaeton', subGenre: 'classic' },
+  { name: 'Wisin y Yandel', priority: 'high', genre: 'reggaeton', subGenre: 'classic' },
+  { name: 'Plan B', priority: 'high', genre: 'reggaeton', subGenre: 'classic' },
+  { name: 'Bad Bunny', priority: 'high', genre: 'reggaeton', subGenre: 'modern' },
+  { name: 'J Balvin', priority: 'high', genre: 'reggaeton', subGenre: 'modern' },
+  { name: 'Feid', priority: 'high', genre: 'reggaeton', subGenre: 'modern' },
+  { name: 'Rauw Alejandro', priority: 'high', genre: 'reggaeton', subGenre: 'modern' },
+  { name: 'Karol G', priority: 'high', genre: 'reggaeton', subGenre: 'modern' },
+  { name: 'Rosalía', priority: 'high', genre: 'reggaeton', subGenre: 'trap-latino' },
+  { name: 'Myke Towers', priority: 'medium', genre: 'reggaeton', subGenre: 'modern' },
+  { name: 'Arcángel', priority: 'medium', genre: 'reggaeton', subGenre: 'classic' },
+];
+
+// =============================================================================
+// ROCK - CLASSIC
 // =============================================================================
 
 export const ROCK: ArtistConfig[] = [
@@ -331,14 +413,13 @@ export const ROCK: ArtistConfig[] = [
   { name: 'Dire Straits', priority: 'high', genre: 'rock', subGenre: 'classic' },
   { name: 'Neil Young', priority: 'high', genre: 'rock', subGenre: 'classic' },
   { name: 'The Kinks', priority: 'medium', genre: 'rock', subGenre: 'classic' },
-  { name: 'The Clash', priority: 'high', genre: 'rock', subGenre: 'classic' },
-  { name: 'Sex Pistols', priority: 'medium', genre: 'rock', subGenre: 'classic' },
+  { name: 'The Clash', priority: 'high', genre: 'rock', subGenre: 'punk' },
   { name: 'U2', priority: 'high', genre: 'rock', subGenre: '80s' },
   { name: 'The Cure', priority: 'high', genre: 'rock', subGenre: '80s' },
   { name: 'Depeche Mode', priority: 'high', genre: 'rock', subGenre: '80s' },
   { name: 'The Smiths', priority: 'high', genre: 'rock', subGenre: '80s' },
   { name: 'Talking Heads', priority: 'high', genre: 'rock', subGenre: '80s' },
-  { name: "Guns N' Roses", priority: 'high', genre: 'rock', subGenre: '80s' },
+  { name: 'Guns N\' Roses', priority: 'high', genre: 'rock', subGenre: '80s' },
   { name: 'Pixies', priority: 'high', genre: 'rock', subGenre: '80s' },
   { name: 'Joy Division', priority: 'high', genre: 'rock', subGenre: '80s' },
   { name: 'Nirvana', priority: 'high', genre: 'rock', subGenre: '90s' },
@@ -399,6 +480,8 @@ export const METAL: ArtistConfig[] = [
   { name: 'Avenged Sevenfold', priority: 'medium', genre: 'metal', subGenre: 'modern' },
   { name: 'Behemoth', priority: 'medium', genre: 'metal', subGenre: 'black' },
   { name: 'Electric Wizard', priority: 'high', genre: 'metal', subGenre: 'doom' },
+  { name: 'Burzum', priority: 'medium', genre: 'metal', subGenre: 'black' },
+  { name: 'Darkthrone', priority: 'medium', genre: 'metal', subGenre: 'black' },
 ];
 
 // =============================================================================
@@ -420,7 +503,7 @@ export const SOUL_RNB: ArtistConfig[] = [
   { name: 'Bill Withers', priority: 'high', genre: 'soul', subGenre: 'classic' },
   { name: 'Isaac Hayes', priority: 'medium', genre: 'soul', subGenre: 'classic' },
   { name: 'Michael Jackson', priority: 'high', genre: 'rnb', subGenre: '80s' },
-  { name: "D'Angelo", priority: 'high', genre: 'rnb', subGenre: '90s' },
+  { name: 'D\'Angelo', priority: 'high', genre: 'rnb', subGenre: '90s' },
   { name: 'Erykah Badu', priority: 'high', genre: 'rnb', subGenre: '90s' },
   { name: 'Aaliyah', priority: 'high', genre: 'rnb', subGenre: '90s' },
   { name: 'Mary J. Blige', priority: 'medium', genre: 'rnb', subGenre: '90s' },
@@ -501,6 +584,22 @@ export const ELECTRO: ArtistConfig[] = [
 ];
 
 // =============================================================================
+// AMBIENT / EXPERIMENTAL
+// =============================================================================
+
+export const AMBIENT_EXPERIMENTAL: ArtistConfig[] = [
+  { name: 'Brian Eno', priority: 'high', genre: 'ambient', subGenre: 'pioneer' },
+  { name: 'Alva Noto', priority: 'high', genre: 'ambient', subGenre: 'glitch' },
+  { name: 'Merzbow', priority: 'medium', genre: 'ambient', subGenre: 'noise' },
+  { name: 'William Basinski', priority: 'high', genre: 'ambient', subGenre: 'experimental' },
+  { name: 'Laurie Anderson', priority: 'medium', genre: 'ambient', subGenre: 'experimental' },
+  { name: 'Yoko Ono', priority: 'medium', genre: 'ambient', subGenre: 'experimental' },
+  { name: 'John Cage', priority: 'high', genre: 'ambient', subGenre: 'avant-garde' },
+  { name: 'Ryoji Ikeda', priority: 'medium', genre: 'ambient', subGenre: 'glitch' },
+  { name: 'Arca', priority: 'high', genre: 'ambient', subGenre: 'experimental' },
+];
+
+// =============================================================================
 // REGGAE
 // =============================================================================
 
@@ -564,12 +663,28 @@ export const AFRO_WORLD: ArtistConfig[] = [
   { name: 'Tems', priority: 'high', genre: 'afro', subGenre: 'afrobeats' },
   { name: 'Rema', priority: 'medium', genre: 'afro', subGenre: 'afrobeats' },
   { name: 'Asake', priority: 'medium', genre: 'afro', subGenre: 'afrobeats' },
-  { name: 'Bad Bunny', priority: 'high', genre: 'world', subGenre: 'latin' },
-  { name: 'Rosalía', priority: 'high', genre: 'world', subGenre: 'latin' },
-  { name: 'J Balvin', priority: 'medium', genre: 'world', subGenre: 'latin' },
   { name: 'Caetano Veloso', priority: 'high', genre: 'world', subGenre: 'brazil' },
   { name: 'Gilberto Gil', priority: 'high', genre: 'world', subGenre: 'brazil' },
   { name: 'Jorge Ben Jor', priority: 'medium', genre: 'world', subGenre: 'brazil' },
+];
+
+// =============================================================================
+// INDIE / ALTERNATIVE POP
+// =============================================================================
+
+export const INDIE_ALT_POP: ArtistConfig[] = [
+  { name: 'Belle and Sebastian', priority: 'high', genre: 'indie', subGenre: 'indie-pop' },
+  { name: 'Pavement', priority: 'high', genre: 'indie', subGenre: 'indie' },
+  { name: 'Guided by Voices', priority: 'medium', genre: 'indie', subGenre: 'indie' },
+  { name: 'Built to Spill', priority: 'medium', genre: 'indie', subGenre: 'indie' },
+  { name: 'Modest Mouse', priority: 'high', genre: 'indie', subGenre: 'indie' },
+  { name: 'The Magnetic Fields', priority: 'medium', genre: 'indie', subGenre: 'indie-pop' },
+  { name: 'Neutral Milk Hotel', priority: 'high', genre: 'indie', subGenre: 'indie' },
+  { name: 'Joanna Newsom', priority: 'high', genre: 'indie', subGenre: 'indie-folk' },
+  { name: 'Grimes', priority: 'high', genre: 'indie', subGenre: 'experimental-pop' },
+  { name: 'FKA Twigs', priority: 'high', genre: 'indie', subGenre: 'experimental' },
+  { name: 'Angel Olsen', priority: 'high', genre: 'indie', subGenre: 'indie' },
+  { name: 'Big Thief', priority: 'medium', genre: 'indie', subGenre: 'indie-folk' },
 ];
 
 // =============================================================================
@@ -630,27 +745,62 @@ export const BLUES: ArtistConfig[] = [
 ];
 
 // =============================================================================
-// CLASSICAL / OST / K-POP (The missing pieces)
+// GOSPEL
+// =============================================================================
+
+export const GOSPEL: ArtistConfig[] = [
+  { name: 'Mahalia Jackson', priority: 'high', genre: 'gospel', subGenre: 'classic' },
+  { name: 'Sam Cooke', priority: 'high', genre: 'gospel', subGenre: 'classic' },
+  { name: 'Aretha Franklin', priority: 'high', genre: 'gospel', subGenre: 'soul-gospel' },
+  { name: 'The Staple Singers', priority: 'high', genre: 'gospel', subGenre: 'classic' },
+  { name: 'Shirley Caesar', priority: 'medium', genre: 'gospel', subGenre: 'classic' },
+  { name: 'Kirk Franklin', priority: 'medium', genre: 'gospel', subGenre: 'contemporary' },
+];
+
+// =============================================================================
+// CLASSICAL
 // =============================================================================
 
 export const CLASSICAL: ArtistConfig[] = [
-  { name: 'Beethoven', priority: 'high', genre: 'classical', subGenre: 'romantic' },
-  { name: 'Bach', priority: 'high', genre: 'classical', subGenre: 'baroque' },
-  { name: 'Chopin', priority: 'high', genre: 'classical', subGenre: 'romantic' },
-  { name: 'Mozart', priority: 'high', genre: 'classical', subGenre: 'classic' },
-  { name: 'Debussy', priority: 'high', genre: 'classical', subGenre: 'impressionist' },
+  { name: 'Ludwig van Beethoven', priority: 'high', genre: 'classical', subGenre: 'romantic' },
+  { name: 'Johann Sebastian Bach', priority: 'high', genre: 'classical', subGenre: 'baroque' },
+  { name: 'Frédéric Chopin', priority: 'high', genre: 'classical', subGenre: 'romantic' },
+  { name: 'Wolfgang Amadeus Mozart', priority: 'high', genre: 'classical', subGenre: 'classic' },
+  { name: 'Claude Debussy', priority: 'high', genre: 'classical', subGenre: 'impressionist' },
+  { name: 'Igor Stravinsky', priority: 'high', genre: 'classical', subGenre: 'modern' },
+  { name: 'Arnold Schoenberg', priority: 'medium', genre: 'classical', subGenre: 'modern' },
+  { name: 'Gustav Mahler', priority: 'medium', genre: 'classical', subGenre: 'romantic' },
 ];
+
+// =============================================================================
+// OST / SOUNDTRACKS
+// =============================================================================
 
 export const OST: ArtistConfig[] = [
   { name: 'Hans Zimmer', priority: 'high', genre: 'ost', subGenre: 'cinema' },
   { name: 'Joe Hisaishi', priority: 'high', genre: 'ost', subGenre: 'anime' },
   { name: 'Ennio Morricone', priority: 'high', genre: 'ost', subGenre: 'cinema' },
+  { name: 'John Williams', priority: 'high', genre: 'ost', subGenre: 'cinema' },
+  { name: 'Trent Reznor', priority: 'high', genre: 'ost', subGenre: 'cinema' },
 ];
+
+// =============================================================================
+// K-POP / J-POP
+// =============================================================================
 
 export const K_POP: ArtistConfig[] = [
   { name: 'BTS', priority: 'high', genre: 'kpop', subGenre: 'idol' },
-  { name: 'Blackpink', priority: 'high', genre: 'kpop', subGenre: 'idol' },
+  { name: 'BLACKPINK', priority: 'high', genre: 'kpop', subGenre: 'idol' },
   { name: 'NewJeans', priority: 'high', genre: 'kpop', subGenre: 'modern' },
+  { name: 'SEVENTEEN', priority: 'medium', genre: 'kpop', subGenre: 'idol' },
+  { name: 'Stray Kids', priority: 'medium', genre: 'kpop', subGenre: 'idol' },
+  { name: 'TWICE', priority: 'medium', genre: 'kpop', subGenre: 'idol' },
+];
+
+export const J_POP: ArtistConfig[] = [
+  { name: 'Chara', priority: 'medium', genre: 'jpop', subGenre: 'classic' },
+  { name: 'Tokyo Jihen', priority: 'medium', genre: 'jpop', subGenre: 'rock' },
+  { name: 'SEKAI NO OWARI', priority: 'medium', genre: 'jpop', subGenre: 'indie' },
 ];
 
 // =============================================================================
@@ -666,9 +816,10 @@ export const ALL_RAP_FR = [
 ];
 
 export const ALL_ARTISTS: ArtistConfig[] = [
-  ...ALL_RAP_US, ...ALL_RAP_FR, ...RAP_BE_CH, ...ROCK, ...METAL, ...SOUL_RNB, 
-  ...JAZZ, ...ELECTRO, ...REGGAE, ...CHANSON_FR, ...AFRO_WORLD, ...POP, ...COUNTRY_FOLK, ...BLUES,
-  ...CLASSICAL, ...OST, ...K_POP
+  ...ALL_RAP_US, ...ALL_RAP_FR, ...RAP_BE_CH, ...PUNK, ...FUNK, ...DISCO,
+  ...REGGAETON_LATIN, ...ROCK, ...METAL, ...SOUL_RNB, ...JAZZ, ...ELECTRO,
+  ...AMBIENT_EXPERIMENTAL, ...REGGAE, ...CHANSON_FR, ...AFRO_WORLD, ...INDIE_ALT_POP,
+  ...POP, ...COUNTRY_FOLK, ...BLUES, ...GOSPEL, ...CLASSICAL, ...OST, ...K_POP, ...J_POP
 ];
 
 export const ARTIST_STATS = {
@@ -676,11 +827,26 @@ export const ARTIST_STATS = {
   rapUS: ALL_RAP_US.length,
   rapFR: ALL_RAP_FR.length,
   rapBeCh: RAP_BE_CH.length,
+  punk: PUNK.length,
+  funk: FUNK.length,
+  disco: DISCO.length,
+  reggaeton: REGGAETON_LATIN.length,
   rock: ROCK.length,
   metal: METAL.length,
   soulRnb: SOUL_RNB.length,
   jazz: JAZZ.length,
   electro: ELECTRO.length,
+  ambient: AMBIENT_EXPERIMENTAL.length,
+  reggae: REGGAE.length,
+  chansonFr: CHANSON_FR.length,
+  afro: AFRO_WORLD.length,
+  indie: INDIE_ALT_POP.length,
+  pop: POP.length,
+  country: COUNTRY_FOLK.length,
+  blues: BLUES.length,
+  gospel: GOSPEL.length,
   classical: CLASSICAL.length,
-  kpop: K_POP.length
+  ost: OST.length,
+  kpop: K_POP.length,
+  jpop: J_POP.length
 };
