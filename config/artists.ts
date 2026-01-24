@@ -161,7 +161,25 @@ export const RAP_US_2020S: ArtistConfig[] = [
 ];
 
 // =============================================================================
-// RAP FR - CLASSIQUES
+// RAP US - UNDERGROUND & REGIONAL ADDITIONS
+// =============================================================================
+
+export const RAP_US_EXTENDED: ArtistConfig[] = [
+  { name: 'Aesop Rock', priority: 'high', genre: 'rap-us', subGenre: 'underground' },
+  { name: 'Billy Woods', priority: 'high', genre: 'rap-us', subGenre: 'underground' },
+  { name: 'Roc Marciano', priority: 'high', genre: 'rap-us', subGenre: 'underground' },
+  { name: 'JPEGMAFIA', priority: 'high', genre: 'rap-us', subGenre: 'experimental' },
+  { name: 'Death Grips', priority: 'high', genre: 'rap-us', subGenre: 'experimental' },
+  { name: 'Too $hort', priority: 'medium', genre: 'rap-us', subGenre: 'west-coast' },
+  { name: 'E-40', priority: 'medium', genre: 'rap-us', subGenre: 'west-coast' },
+  { name: 'Nipsey Hussle', priority: 'high', genre: 'rap-us', subGenre: 'west-coast' },
+  { name: 'Little Simz', priority: 'high', genre: 'rap-uk', subGenre: 'modern' },
+  { name: 'Central Cee', priority: 'high', genre: 'rap-uk', subGenre: 'drill' },
+  { name: 'Skepta', priority: 'high', genre: 'rap-uk', subGenre: 'grime' },
+];
+
+// =============================================================================
+// RAP FR
 // =============================================================================
 
 export const RAP_FR_CLASSIC: ArtistConfig[] = [
@@ -259,6 +277,21 @@ export const RAP_FR_2020S: ArtistConfig[] = [
 ];
 
 // =============================================================================
+// RAP FR - INDEPENDANT / PLUME
+// =============================================================================
+
+export const RAP_FR_INDEPENDENT: ArtistConfig[] = [
+  { name: 'Hugo TSR', priority: 'high', genre: 'rap-fr', subGenre: 'indie' },
+  { name: 'Furax Barbarossa', priority: 'high', genre: 'rap-fr', subGenre: 'indie' },
+  { name: 'Scylla', priority: 'high', genre: 'rap-fr', subGenre: 'indie' },
+  { name: 'Swift Guad', priority: 'medium', genre: 'rap-fr', subGenre: 'indie' },
+  { name: 'Dooz Kawa', priority: 'medium', genre: 'rap-fr', subGenre: 'indie' },
+  { name: 'Jazzy Bazz', priority: 'high', genre: 'rap-fr', subGenre: 'indie' },
+  { name: 'Prince Waly', priority: 'high', genre: 'rap-fr', subGenre: 'indie' },
+  { name: 'Yamê', priority: 'high', genre: 'rap-fr', subGenre: 'next-gen' },
+];
+
+// =============================================================================
 // RAP BELGIQUE & SUISSE
 // =============================================================================
 
@@ -333,6 +366,10 @@ export const ROCK: ArtistConfig[] = [
   { name: 'Khruangbin', priority: 'high', genre: 'rock', subGenre: '2010s' },
   { name: 'IDLES', priority: 'medium', genre: 'rock', subGenre: '2020s' },
   { name: 'Fontaines D.C.', priority: 'medium', genre: 'rock', subGenre: '2020s' },
+  { name: 'King Gizzard & The Lizard Wizard', priority: 'high', genre: 'rock', subGenre: 'psych' },
+  { name: 'Sonic Youth', priority: 'high', genre: 'rock', subGenre: 'noise' },
+  { name: 'Interpol', priority: 'high', genre: 'rock', subGenre: 'indie' },
+  { name: 'Viagra Boys', priority: 'medium', genre: 'rock', subGenre: 'post-punk' },
 ];
 
 // =============================================================================
@@ -360,6 +397,8 @@ export const METAL: ArtistConfig[] = [
   { name: 'Korn', priority: 'high', genre: 'metal', subGenre: 'modern' },
   { name: 'Meshuggah', priority: 'medium', genre: 'metal', subGenre: 'modern' },
   { name: 'Avenged Sevenfold', priority: 'medium', genre: 'metal', subGenre: 'modern' },
+  { name: 'Behemoth', priority: 'medium', genre: 'metal', subGenre: 'black' },
+  { name: 'Electric Wizard', priority: 'high', genre: 'metal', subGenre: 'doom' },
 ];
 
 // =============================================================================
@@ -457,6 +496,8 @@ export const ELECTRO: ArtistConfig[] = [
   { name: 'Fred again..', priority: 'high', genre: 'electro', subGenre: '2020s' },
   { name: 'Peggy Gou', priority: 'medium', genre: 'electro', subGenre: '2020s' },
   { name: 'Overmono', priority: 'medium', genre: 'electro', subGenre: '2020s' },
+  { name: 'Squarepusher', priority: 'high', genre: 'electro', subGenre: 'idm' },
+  { name: 'Jon Hopkins', priority: 'high', genre: 'electro', subGenre: 'ambient' },
 ];
 
 // =============================================================================
@@ -589,14 +630,45 @@ export const BLUES: ArtistConfig[] = [
 ];
 
 // =============================================================================
-// EXPORTS & STATS (Calculés sur l'ensemble)
+// CLASSICAL / OST / K-POP (The missing pieces)
 // =============================================================================
 
-export const ALL_RAP_US = [...RAP_US_GOLDEN_AGE, ...RAP_US_2000S, ...RAP_US_2010S, ...RAP_US_2020S];
-export const ALL_RAP_FR = [...RAP_FR_CLASSIC, ...RAP_FR_2010S, ...RAP_FR_2020S];
+export const CLASSICAL: ArtistConfig[] = [
+  { name: 'Beethoven', priority: 'high', genre: 'classical', subGenre: 'romantic' },
+  { name: 'Bach', priority: 'high', genre: 'classical', subGenre: 'baroque' },
+  { name: 'Chopin', priority: 'high', genre: 'classical', subGenre: 'romantic' },
+  { name: 'Mozart', priority: 'high', genre: 'classical', subGenre: 'classic' },
+  { name: 'Debussy', priority: 'high', genre: 'classical', subGenre: 'impressionist' },
+];
+
+export const OST: ArtistConfig[] = [
+  { name: 'Hans Zimmer', priority: 'high', genre: 'ost', subGenre: 'cinema' },
+  { name: 'Joe Hisaishi', priority: 'high', genre: 'ost', subGenre: 'anime' },
+  { name: 'Ennio Morricone', priority: 'high', genre: 'ost', subGenre: 'cinema' },
+];
+
+export const K_POP: ArtistConfig[] = [
+  { name: 'BTS', priority: 'high', genre: 'kpop', subGenre: 'idol' },
+  { name: 'Blackpink', priority: 'high', genre: 'kpop', subGenre: 'idol' },
+  { name: 'NewJeans', priority: 'high', genre: 'kpop', subGenre: 'modern' },
+];
+
+// =============================================================================
+// FINAL EXPORTS & AGGREGATIONS
+// =============================================================================
+
+export const ALL_RAP_US = [
+  ...RAP_US_GOLDEN_AGE, ...RAP_US_2000S, ...RAP_US_2010S, ...RAP_US_2020S, ...RAP_US_EXTENDED
+];
+
+export const ALL_RAP_FR = [
+  ...RAP_FR_CLASSIC, ...RAP_FR_2010S, ...RAP_FR_2020S, ...RAP_FR_INDEPENDENT
+];
+
 export const ALL_ARTISTS: ArtistConfig[] = [
   ...ALL_RAP_US, ...ALL_RAP_FR, ...RAP_BE_CH, ...ROCK, ...METAL, ...SOUL_RNB, 
   ...JAZZ, ...ELECTRO, ...REGGAE, ...CHANSON_FR, ...AFRO_WORLD, ...POP, ...COUNTRY_FOLK, ...BLUES,
+  ...CLASSICAL, ...OST, ...K_POP
 ];
 
 export const ARTIST_STATS = {
@@ -609,10 +681,6 @@ export const ARTIST_STATS = {
   soulRnb: SOUL_RNB.length,
   jazz: JAZZ.length,
   electro: ELECTRO.length,
-  reggae: REGGAE.length,
-  chansonFr: CHANSON_FR.length,
-  afroWorld: AFRO_WORLD.length,
-  pop: POP.length,
-  countryFolk: COUNTRY_FOLK.length,
-  blues: BLUES.length,
+  classical: CLASSICAL.length,
+  kpop: K_POP.length
 };
