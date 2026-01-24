@@ -1,5 +1,5 @@
 /**
- * Liste des artistes rap US/FR/BE/CH
+ * Liste des artistes
  */
 
 import type { ArtistConfig } from '../src/utils/types.js';
@@ -46,6 +46,11 @@ export const RAP_US_GOLDEN_AGE: ArtistConfig[] = [
   { name: 'Three 6 Mafia', priority: 'medium', genre: 'rap-us', subGenre: 'golden-age' },
   { name: 'Bone Thugs-N-Harmony', priority: 'medium', genre: 'rap-us', subGenre: 'golden-age' },
   { name: 'Big Pun', priority: 'medium', genre: 'rap-us', subGenre: 'golden-age' },
+  { name: 'Slick Rick', priority: 'medium', genre: 'rap-us', subGenre: 'golden-age' },
+  { name: 'LL Cool J', priority: 'medium', genre: 'rap-us', subGenre: 'golden-age' },
+  { name: 'EPMD', priority: 'medium', genre: 'rap-us', subGenre: 'golden-age' },
+  { name: 'The Pharcyde', priority: 'medium', genre: 'rap-us', subGenre: 'golden-age' },
+  { name: 'Cypress Hill', priority: 'medium', genre: 'rap-us', subGenre: 'golden-age' },
 ];
 
 // =============================================================================
@@ -71,6 +76,12 @@ export const RAP_US_2000S: ArtistConfig[] = [
   { name: 'Gucci Mane', priority: 'medium', genre: 'rap-us', subGenre: '2000s' },
   { name: 'Lupe Fiasco', priority: 'medium', genre: 'rap-us', subGenre: '2000s' },
   { name: 'Pharrell Williams', priority: 'medium', genre: 'rap-us', subGenre: '2000s' },
+  { name: 'Missy Elliott', priority: 'high', genre: 'rap-us', subGenre: '2000s' },
+  { name: 'Busta Rhymes', priority: 'high', genre: 'rap-us', subGenre: '2000s' },
+  { name: 'Cam\'ron', priority: 'medium', genre: 'rap-us', subGenre: '2000s' },
+  { name: 'Nelly', priority: 'medium', genre: 'rap-us', subGenre: '2000s' },
+  { name: 'Jadakiss', priority: 'medium', genre: 'rap-us', subGenre: '2000s' },
+  { name: 'Fat Joe', priority: 'medium', genre: 'rap-us', subGenre: '2000s' },
 ];
 
 // =============================================================================
@@ -105,6 +116,10 @@ export const RAP_US_2010S: ArtistConfig[] = [
   { name: 'Isaiah Rashad', priority: 'medium', genre: 'rap-us', subGenre: '2010s' },
   { name: '21 Savage', priority: 'medium', genre: 'rap-us', subGenre: '2010s' },
   { name: 'Lil Uzi Vert', priority: 'medium', genre: 'rap-us', subGenre: '2010s' },
+  { name: 'Wiz Khalifa', priority: 'medium', genre: 'rap-us', subGenre: '2010s' },
+  { name: 'Logic', priority: 'medium', genre: 'rap-us', subGenre: '2010s' },
+  { name: 'A$AP Ferg', priority: 'medium', genre: 'rap-us', subGenre: '2010s' },
+  { name: 'Brockhampton', priority: 'medium', genre: 'rap-us', subGenre: '2010s' },
 ];
 
 // =============================================================================
@@ -127,6 +142,9 @@ export const RAP_US_2020S: ArtistConfig[] = [
   { name: 'Benny the Butcher', priority: 'medium', genre: 'rap-us', subGenre: '2020s' },
   { name: 'Boldy James', priority: 'medium', genre: 'rap-us', subGenre: '2020s' },
   { name: 'Larry June', priority: 'medium', genre: 'rap-us', subGenre: '2020s' },
+  { name: 'Metro Boomin', priority: 'high', genre: 'rap-us', subGenre: '2020s' },
+  { name: 'Ice Spice', priority: 'medium', genre: 'rap-us', subGenre: '2020s' },
+  { name: 'Central Cee', priority: 'high', genre: 'rap-uk', subGenre: 'drill' },
 ];
 
 // =============================================================================
@@ -153,6 +171,11 @@ export const RAP_FR_CLASSIC: ArtistConfig[] = [
   { name: 'Disiz', priority: 'medium', genre: 'rap-fr', subGenre: 'classic' },
   { name: 'Youssoupha', priority: 'medium', genre: 'rap-fr', subGenre: 'classic' },
   { name: 'Médine', priority: 'medium', genre: 'rap-fr', subGenre: 'classic' },
+  { name: 'Mafia K\'1 Fry', priority: 'high', genre: 'rap-fr', subGenre: 'classic' },
+  { name: 'Ideal J', priority: 'medium', genre: 'rap-fr', subGenre: 'classic' },
+  { name: 'X-Men', priority: 'medium', genre: 'rap-fr', subGenre: 'classic' },
+  { name: 'Passi', priority: 'medium', genre: 'rap-fr', subGenre: 'classic' },
+  { name: '113', priority: 'high', genre: 'rap-fr', subGenre: 'classic' },
 ];
 
 // =============================================================================
@@ -180,6 +203,10 @@ export const RAP_FR_2010S: ArtistConfig[] = [
   { name: 'Kalash Criminel', priority: 'medium', genre: 'rap-fr', subGenre: '2010s' },
   { name: 'Georgio', priority: 'medium', genre: 'rap-fr', subGenre: '2010s' },
   { name: 'Dinos', priority: 'medium', genre: 'rap-fr', subGenre: '2010s' },
+  { name: '1995', priority: 'medium', genre: 'rap-fr', subGenre: '2010s' },
+  { name: 'S-Crew', priority: 'medium', genre: 'rap-fr', subGenre: '2010s' },
+  { name: 'MZ', priority: 'medium', genre: 'rap-fr', subGenre: '2010s' },
+  { name: 'Shay', priority: 'medium', genre: 'rap-fr', subGenre: '2010s' },
 ];
 
 // =============================================================================
@@ -202,6 +229,10 @@ export const RAP_FR_2020S: ArtistConfig[] = [
   { name: 'La Fève', priority: 'medium', genre: 'rap-fr', subGenre: '2020s' },
   { name: 'Ashe 22', priority: 'medium', genre: 'rap-fr', subGenre: '2020s' },
   { name: 'Kerchak', priority: 'medium', genre: 'rap-fr', subGenre: '2020s' },
+  { name: 'Khali', priority: 'medium', genre: 'rap-fr', subGenre: '2020s' },
+  { name: 'H Jeune Crack', priority: 'medium', genre: 'rap-fr', subGenre: '2020s' },
+  { name: 'Luther', priority: 'medium', genre: 'rap-fr', subGenre: '2020s' },
+  { name: 'Tif', priority: 'medium', genre: 'rap-fr', subGenre: '2020s' },
 ];
 
 // =============================================================================
@@ -213,10 +244,13 @@ export const RAP_BE_CH: ArtistConfig[] = [
   { name: 'Roméo Elvis', priority: 'high', genre: 'rap-be', subGenre: 'be' },
   { name: 'Caballero & JeanJass', priority: 'medium', genre: 'rap-be', subGenre: 'be' },
   { name: 'L\'Or du Commun', priority: 'medium', genre: 'rap-be', subGenre: 'be' },
+  { name: 'Green Montana', priority: 'high', genre: 'rap-be', subGenre: 'be' },
+  { name: 'Damso', priority: 'high', genre: 'rap-be', subGenre: 'be' }, // Redondant mais important ici aussi
   { name: 'Di-Meh', priority: 'high', genre: 'rap-ch', subGenre: 'ch' },
   { name: 'Slimka', priority: 'high', genre: 'rap-ch', subGenre: 'ch' },
   { name: 'Makala', priority: 'medium', genre: 'rap-ch', subGenre: 'ch' },
   { name: 'Stress', priority: 'medium', genre: 'rap-ch', subGenre: 'ch' },
+  { name: 'Mairo', priority: 'medium', genre: 'rap-ch', subGenre: 'ch' },
 ];
 
 // =============================================================================
@@ -240,6 +274,8 @@ export const ROCK: ArtistConfig[] = [
   { name: 'Fleetwood Mac', priority: 'high', genre: 'rock', subGenre: 'classic' },
   { name: 'AC/DC', priority: 'high', genre: 'rock', subGenre: 'classic' },
   { name: 'Dire Straits', priority: 'high', genre: 'rock', subGenre: 'classic' },
+  { name: 'Neil Young', priority: 'high', genre: 'rock', subGenre: 'classic' },
+  { name: 'The Kinks', priority: 'medium', genre: 'rock', subGenre: 'classic' },
   // 80s-90s
   { name: 'U2', priority: 'high', genre: 'rock', subGenre: '80s' },
   { name: 'The Cure', priority: 'high', genre: 'rock', subGenre: '80s' },
@@ -247,6 +283,7 @@ export const ROCK: ArtistConfig[] = [
   { name: 'The Smiths', priority: 'high', genre: 'rock', subGenre: '80s' },
   { name: 'Talking Heads', priority: 'high', genre: 'rock', subGenre: '80s' },
   { name: "Guns N' Roses", priority: 'high', genre: 'rock', subGenre: '80s' },
+  { name: 'Pixies', priority: 'high', genre: 'rock', subGenre: '80s' },
   { name: 'Nirvana', priority: 'high', genre: 'rock', subGenre: '90s' },
   { name: 'Pearl Jam', priority: 'high', genre: 'rock', subGenre: '90s' },
   { name: 'Soundgarden', priority: 'high', genre: 'rock', subGenre: '90s' },
@@ -256,7 +293,7 @@ export const ROCK: ArtistConfig[] = [
   { name: 'Oasis', priority: 'high', genre: 'rock', subGenre: '90s' },
   { name: 'Tool', priority: 'high', genre: 'rock', subGenre: '90s' },
   { name: 'Foo Fighters', priority: 'high', genre: 'rock', subGenre: '90s' },
-  { name: 'Pixies', priority: 'high', genre: 'rock', subGenre: '90s' },
+  { name: 'Blur', priority: 'medium', genre: 'rock', subGenre: '90s' },
   // 2000s+
   { name: 'The Strokes', priority: 'high', genre: 'rock', subGenre: '2000s' },
   { name: 'The White Stripes', priority: 'high', genre: 'rock', subGenre: '2000s' },
@@ -266,9 +303,12 @@ export const ROCK: ArtistConfig[] = [
   { name: 'Queens of the Stone Age', priority: 'high', genre: 'rock', subGenre: '2000s' },
   { name: 'The National', priority: 'high', genre: 'rock', subGenre: '2000s' },
   { name: 'LCD Soundsystem', priority: 'high', genre: 'rock', subGenre: '2000s' },
+  { name: 'Linkin Park', priority: 'high', genre: 'rock', subGenre: '2000s' },
+  { name: 'The Killers', priority: 'medium', genre: 'rock', subGenre: '2000s' },
   { name: 'Tame Impala', priority: 'high', genre: 'rock', subGenre: '2010s' },
   { name: 'Bon Iver', priority: 'high', genre: 'rock', subGenre: '2010s' },
   { name: 'Khruangbin', priority: 'high', genre: 'rock', subGenre: '2010s' },
+  { name: 'Greta Van Fleet', priority: 'medium', genre: 'rock', subGenre: '2020s' },
 ];
 
 // =============================================================================
@@ -283,12 +323,16 @@ export const METAL: ArtistConfig[] = [
   { name: 'Slayer', priority: 'high', genre: 'metal', subGenre: 'thrash' },
   { name: 'Megadeth', priority: 'high', genre: 'metal', subGenre: 'thrash' },
   { name: 'Pantera', priority: 'high', genre: 'metal', subGenre: 'thrash' },
+  { name: 'Anthrax', priority: 'medium', genre: 'metal', subGenre: 'thrash' },
   { name: 'Opeth', priority: 'high', genre: 'metal', subGenre: 'death' },
   { name: 'Gojira', priority: 'high', genre: 'metal', subGenre: 'death' },
+  { name: 'Death', priority: 'medium', genre: 'metal', subGenre: 'death' },
   { name: 'Mastodon', priority: 'high', genre: 'metal', subGenre: 'modern' },
   { name: 'Deftones', priority: 'high', genre: 'metal', subGenre: 'modern' },
   { name: 'Slipknot', priority: 'high', genre: 'metal', subGenre: 'modern' },
   { name: 'Rammstein', priority: 'high', genre: 'metal', subGenre: 'modern' },
+  { name: 'System of a Down', priority: 'high', genre: 'metal', subGenre: 'modern' },
+  { name: 'Korn', priority: 'high', genre: 'metal', subGenre: 'modern' },
 ];
 
 // =============================================================================
@@ -306,14 +350,19 @@ export const SOUL_RNB: ArtistConfig[] = [
   { name: 'Nina Simone', priority: 'high', genre: 'soul', subGenre: 'classic' },
   { name: 'Prince', priority: 'high', genre: 'soul', subGenre: 'funk' },
   { name: 'Parliament', priority: 'high', genre: 'soul', subGenre: 'funk' },
+  { name: 'Ray Charles', priority: 'high', genre: 'soul', subGenre: 'classic' },
   { name: 'Michael Jackson', priority: 'high', genre: 'rnb', subGenre: '80s' },
   { name: "D'Angelo", priority: 'high', genre: 'rnb', subGenre: '90s' },
   { name: 'Erykah Badu', priority: 'high', genre: 'rnb', subGenre: '90s' },
   { name: 'Aaliyah', priority: 'high', genre: 'rnb', subGenre: '90s' },
+  { name: 'Mary J. Blige', priority: 'medium', genre: 'rnb', subGenre: '90s' },
   { name: 'Beyoncé', priority: 'high', genre: 'rnb', subGenre: '2000s' },
+  { name: 'Usher', priority: 'medium', genre: 'rnb', subGenre: '2000s' },
+  { name: 'Alicia Keys', priority: 'medium', genre: 'rnb', subGenre: '2000s' },
   { name: 'Frank Ocean', priority: 'high', genre: 'rnb', subGenre: '2010s' },
   { name: 'The Weeknd', priority: 'high', genre: 'rnb', subGenre: '2010s' },
   { name: 'SZA', priority: 'high', genre: 'rnb', subGenre: '2010s' },
+  { name: 'Solange', priority: 'medium', genre: 'rnb', subGenre: '2010s' },
   { name: 'Steve Lacy', priority: 'high', genre: 'rnb', subGenre: '2020s' },
 ];
 
@@ -335,9 +384,11 @@ export const JAZZ: ArtistConfig[] = [
   { name: 'Pharoah Sanders', priority: 'high', genre: 'jazz', subGenre: 'classic' },
   { name: 'Sun Ra', priority: 'high', genre: 'jazz', subGenre: 'classic' },
   { name: 'Alice Coltrane', priority: 'high', genre: 'jazz', subGenre: 'classic' },
+  { name: 'Sonny Rollins', priority: 'medium', genre: 'jazz', subGenre: 'classic' },
   { name: 'Kamasi Washington', priority: 'high', genre: 'jazz', subGenre: 'modern' },
   { name: 'Robert Glasper', priority: 'high', genre: 'jazz', subGenre: 'modern' },
   { name: 'Thundercat', priority: 'high', genre: 'jazz', subGenre: 'modern' },
+  { name: 'Snarky Puppy', priority: 'medium', genre: 'jazz', subGenre: 'modern' },
 ];
 
 // =============================================================================
@@ -360,12 +411,14 @@ export const ELECTRO: ArtistConfig[] = [
   { name: 'Air', priority: 'high', genre: 'electro', subGenre: 'french-touch' },
   { name: 'Justice', priority: 'high', genre: 'electro', subGenre: 'french-touch' },
   { name: 'Laurent Garnier', priority: 'high', genre: 'electro', subGenre: 'techno' },
+  { name: 'Gesaffelstein', priority: 'high', genre: 'electro', subGenre: 'techno' },
   { name: 'Disclosure', priority: 'high', genre: 'electro', subGenre: '2010s' },
   { name: 'Flume', priority: 'high', genre: 'electro', subGenre: '2010s' },
   { name: 'Jamie xx', priority: 'high', genre: 'electro', subGenre: '2010s' },
   { name: 'Kaytranada', priority: 'high', genre: 'electro', subGenre: '2010s' },
   { name: 'Bonobo', priority: 'high', genre: 'electro', subGenre: '2010s' },
   { name: 'Fred again..', priority: 'high', genre: 'electro', subGenre: '2020s' },
+  { name: 'Peggy Gou', priority: 'medium', genre: 'electro', subGenre: '2020s' },
 ];
 
 // =============================================================================
@@ -377,10 +430,13 @@ export const REGGAE: ArtistConfig[] = [
   { name: 'Peter Tosh', priority: 'high', genre: 'reggae', subGenre: 'roots' },
   { name: 'Jimmy Cliff', priority: 'high', genre: 'reggae', subGenre: 'roots' },
   { name: 'Burning Spear', priority: 'high', genre: 'reggae', subGenre: 'roots' },
+  { name: 'Gregory Isaacs', priority: 'medium', genre: 'reggae', subGenre: 'roots' },
   { name: 'Lee "Scratch" Perry', priority: 'high', genre: 'reggae', subGenre: 'dub' },
   { name: 'King Tubby', priority: 'high', genre: 'reggae', subGenre: 'dub' },
   { name: 'Augustus Pablo', priority: 'high', genre: 'reggae', subGenre: 'dub' },
   { name: 'Damian Marley', priority: 'high', genre: 'reggae', subGenre: 'modern' },
+  { name: 'Protoje', priority: 'medium', genre: 'reggae', subGenre: 'modern' },
+  { name: 'Chronixx', priority: 'medium', genre: 'reggae', subGenre: 'modern' },
 ];
 
 // =============================================================================
@@ -394,12 +450,16 @@ export const CHANSON_FR: ArtistConfig[] = [
   { name: 'Édith Piaf', priority: 'high', genre: 'chanson-fr', subGenre: 'classic' },
   { name: 'Françoise Hardy', priority: 'high', genre: 'chanson-fr', subGenre: 'classic' },
   { name: 'Alain Bashung', priority: 'high', genre: 'chanson-fr', subGenre: 'classic' },
+  { name: 'Charles Aznavour', priority: 'high', genre: 'chanson-fr', subGenre: 'classic' },
+  { name: 'Barbara', priority: 'medium', genre: 'chanson-fr', subGenre: 'classic' },
   { name: 'Téléphone', priority: 'high', genre: 'chanson-fr', subGenre: 'rock' },
   { name: 'Noir Désir', priority: 'high', genre: 'chanson-fr', subGenre: 'rock' },
   { name: 'Phoenix', priority: 'high', genre: 'chanson-fr', subGenre: 'modern' },
   { name: 'Stromae', priority: 'high', genre: 'chanson-fr', subGenre: 'modern' },
   { name: 'Christine and the Queens', priority: 'high', genre: 'chanson-fr', subGenre: 'modern' },
   { name: 'Angèle', priority: 'high', genre: 'chanson-fr', subGenre: 'modern' },
+  { name: 'Pomme', priority: 'medium', genre: 'chanson-fr', subGenre: 'modern' },
+  { name: 'Clara Luciani', priority: 'medium', genre: 'chanson-fr', subGenre: 'modern' },
 ];
 
 // =============================================================================
@@ -411,13 +471,17 @@ export const AFRO_WORLD: ArtistConfig[] = [
   { name: 'Youssou N\'Dour', priority: 'high', genre: 'afro', subGenre: 'classic' },
   { name: 'Ali Farka Touré', priority: 'high', genre: 'afro', subGenre: 'classic' },
   { name: 'Mulatu Astatke', priority: 'high', genre: 'afro', subGenre: 'classic' },
+  { name: 'Miriam Makeba', priority: 'high', genre: 'afro', subGenre: 'classic' },
   { name: 'Burna Boy', priority: 'high', genre: 'afro', subGenre: 'afrobeats' },
   { name: 'Wizkid', priority: 'high', genre: 'afro', subGenre: 'afrobeats' },
   { name: 'Tems', priority: 'high', genre: 'afro', subGenre: 'afrobeats' },
+  { name: 'Rema', priority: 'medium', genre: 'afro', subGenre: 'afrobeats' },
   { name: 'Bad Bunny', priority: 'high', genre: 'world', subGenre: 'latin' },
   { name: 'Rosalía', priority: 'high', genre: 'world', subGenre: 'latin' },
+  { name: 'J Balvin', priority: 'medium', genre: 'world', subGenre: 'latin' },
   { name: 'Caetano Veloso', priority: 'high', genre: 'world', subGenre: 'brazil' },
   { name: 'Gilberto Gil', priority: 'high', genre: 'world', subGenre: 'brazil' },
+  { name: 'Jorge Ben Jor', priority: 'medium', genre: 'world', subGenre: 'brazil' },
 ];
 
 // =============================================================================
@@ -431,9 +495,12 @@ export const POP: ArtistConfig[] = [
   { name: 'Adele', priority: 'high', genre: 'pop', subGenre: '2010s' },
   { name: 'Taylor Swift', priority: 'high', genre: 'pop', subGenre: '2010s' },
   { name: 'Lorde', priority: 'high', genre: 'pop', subGenre: '2010s' },
+  { name: 'Lana Del Rey', priority: 'high', genre: 'pop', subGenre: '2010s' },
   { name: 'Billie Eilish', priority: 'high', genre: 'pop', subGenre: '2020s' },
   { name: 'Dua Lipa', priority: 'high', genre: 'pop', subGenre: '2020s' },
   { name: 'Charli XCX', priority: 'high', genre: 'pop', subGenre: '2020s' },
+  { name: 'Olivia Rodrigo', priority: 'high', genre: 'pop', subGenre: '2020s' },
+  { name: 'Sabrina Carpenter', priority: 'medium', genre: 'pop', subGenre: '2020s' },
 ];
 
 // =============================================================================
@@ -449,6 +516,7 @@ export const COUNTRY_FOLK: ArtistConfig[] = [
   { name: 'Nick Drake', priority: 'high', genre: 'country', subGenre: 'folk' },
   { name: 'Phoebe Bridgers', priority: 'high', genre: 'country', subGenre: 'folk' },
   { name: 'Sufjan Stevens', priority: 'high', genre: 'country', subGenre: 'folk' },
+  { name: 'Adrianne Lenker', priority: 'medium', genre: 'country', subGenre: 'folk' },
 ];
 
 // =============================================================================
@@ -461,7 +529,9 @@ export const BLUES: ArtistConfig[] = [
   { name: 'B.B. King', priority: 'high', genre: 'blues', subGenre: 'classic' },
   { name: 'Howlin\' Wolf', priority: 'high', genre: 'blues', subGenre: 'classic' },
   { name: 'Buddy Guy', priority: 'high', genre: 'blues', subGenre: 'classic' },
+  { name: 'Etta James', priority: 'high', genre: 'blues', subGenre: 'classic' },
   { name: 'Stevie Ray Vaughan', priority: 'high', genre: 'blues', subGenre: 'modern' },
+  { name: 'Gary Clark Jr.', priority: 'medium', genre: 'blues', subGenre: 'modern' },
 ];
 
 // =============================================================================
