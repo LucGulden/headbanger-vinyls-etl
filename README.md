@@ -1,181 +1,203 @@
-# FillCrate Scripts
+# FillCrate Scripts v2
 
-Scripts de peuplement de la base de données FillCrate (Albums & Vinyls).
+Pipeline ETL pour peupler la base de données FillCrate (Albums & Vinyls).
 
 ## Architecture
 
 ```
 fillcrate-scripts/
 ├── config/
-│   ├── artists.ts        # ~230 artistes rap US/FR organisés par époque
-│   └── settings.ts       # Configuration globale
-├── data/                 # Fichiers de progression (auto-générés)
+│   ├── artists.ts           # ~170 artistes rap US/FR
+│   ├── artists-extended.ts  # ~200 artistes autres genres
+│   ├── artists-test.ts      # 10 artistes de test
+│   ├── playlists.ts         # Playlists Spotify configurées
+│   └── settings.ts          # Configuration
+├── data/                    # JSON intermédiaires (générés)
 ├── src/
 │   ├── utils/
-│   │   ├── supabase.ts   # Client Supabase + opérations BDD
-│   │   ├── spotify.ts    # Client Spotify API
-│   │   ├── musicbrainz.ts # Client MusicBrainz API
-│   │   ├── coverart.ts   # Client Cover Art Archive
-│   │   └── progress.ts   # Gestion reprise/interruption
-│   ├── import-albums.ts  # Script 1: Spotify → Albums
-│   ├── import-vinyls.ts  # Script 2: MusicBrainz → Vinyls
-│   └── fetch-covers.ts   # Script 3: Cover Art Archive → covers
-├── .env.example
-├── package.json
+│   │   ├── types.ts         # Types TypeScript
+│   │   ├── json-store.ts    # Gestion des fichiers pipeline
+│   │   ├── spotify.ts       # Client Spotify API
+│   │   ├── musicbrainz.ts   # Client MusicBrainz API
+│   │   ├── coverart.ts      # Client Cover Art Archive
+│   │   └── supabase.ts      # Client Supabase
+│   ├── extract-spotify.ts   # Phase 1: Extraction Spotify
+│   ├── enrich-musicbrainz.ts # Phase 2: Enrichissement MB
+│   ├── enrich-covers.ts     # Phase 3: Récupération covers
+│   ├── load-database.ts     # Phase 4: Chargement BDD
+│   ├── import-full.ts       # Pipeline complet
+│   └── pipeline-status.ts   # Statut des pipelines
 └── README.md
 ```
 
 ## Installation
 
 ```bash
-# Cloner et installer
-cd fillcrate-scripts
 npm install
-
-# Configuration
 cp .env.example .env
 # Éditer .env avec vos credentials
 ```
 
-## Configuration requise
+## Configuration
 
-### Supabase
-- `SUPABASE_URL` : URL de votre projet
-- `SUPABASE_SERVICE_ROLE_KEY` : Clé service role (pas la clé anon!)
+### Variables d'environnement
 
-### Spotify
-1. Créer une app sur [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
-2. Récupérer Client ID et Client Secret
-3. Pas besoin de redirect URI (Client Credentials Flow)
-
-### Variables optionnelles
-- `BATCH_SIZE` : Nombre d'artistes par batch (défaut: 10)
-- `API_DELAY_MS` : Délai entre requêtes (défaut: 1100ms)
-- `VINYL_COUNTRY` : Pays pour filtrer les pressages (défaut: FR)
-
-## Usage
-
-### Workflow complet
-
-```bash
-# 1. Importer les albums depuis Spotify
-npm run import:albums
-
-# 2. Importer les vinyls depuis MusicBrainz
-npm run import:vinyls
-
-# 3. Récupérer les covers depuis Cover Art Archive
-npm run fetch:covers
+```env
+SUPABASE_URL=https://xxx.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=xxx
+SPOTIFY_CLIENT_ID=xxx
+SPOTIFY_CLIENT_SECRET=xxx
+MB_USER_AGENT=your-email@example.com
+VINYL_COUNTRIES=FR,DE,UK,US
 ```
 
-### Options avancées
-
-```bash
-# Importer seulement les artistes haute priorité
-npm run import:albums -- --priority=high
-
-# Importer seulement le rap français
-npm run import:albums -- --genre=rap-fr
-
-# Importer un artiste spécifique
-npm run import:albums -- --artist="Nas"
-
-# Importer seulement les albums (pas les singles)
-npm run import:albums -- --albumsOnly
-
-# Recommencer à zéro
-npm run import:albums -- --clear
-
-# Filtrer par pays (vinyls)
-npm run import:vinyls -- --country=US
-
-# Limiter le nombre d'items
-npm run import:vinyls -- --limit=100
-```
-
-## Gestion de l'interruption
-
-Les scripts peuvent être interrompus à tout moment avec `Ctrl+C`.
-
-- La progression est sauvegardée dans `data/progress.json`
-- Les erreurs sont loggées dans `data/errors.json`
-- Relancer le script reprend automatiquement où il en était
-
-Pour recommencer à zéro :
-```bash
-npm run import:albums -- --clear
-```
-
-## Schéma de données
-
-### Flow de données
-
-```
-Spotify API                    MusicBrainz API              Cover Art Archive
-     │                              │                              │
-     ▼                              ▼                              │
-┌─────────────────┐         ┌─────────────────┐                   │
-│ Artist Search   │         │ Release Group   │                   │
-│ Artist Albums   │         │ Releases        │                   │
-└────────┬────────┘         └────────┬────────┘                   │
-         │                           │                             │
-         ▼                           ▼                             ▼
-    ┌─────────┐               ┌──────────┐                  ┌───────────┐
-    │ albums  │◄──────────────│  vinyls  │◄─────────────────│  covers   │
-    │  table  │  album_id FK  │  table   │  release_id      │   URLs    │
-    └─────────┘               └──────────┘                  └───────────┘
-```
-
-### Relations
-
-- **Album** = œuvre musicale abstraite (spotify_id, musicbrainz_release_group_id)
-- **Vinyl** = pressage physique spécifique (musicbrainz_release_id)
-- Un Album peut avoir plusieurs Vinyls (différents pressages)
-
-### Colonnes ajoutées
-
-Les scripts nécessitent ces colonnes dans votre schéma Supabase :
+### Colonnes Supabase requises
 
 ```sql
--- Table albums
 ALTER TABLE albums ADD COLUMN IF NOT EXISTS musicbrainz_release_group_id TEXT;
-
--- Table vinyls
+ALTER TABLE albums ADD COLUMN IF NOT EXISTS spotify_url TEXT;
 ALTER TABLE vinyls ADD COLUMN IF NOT EXISTS musicbrainz_release_id TEXT;
 ```
 
-## Artistes inclus
+## Usage
 
-### Rap US (~150 artistes)
-- **Golden Age** : Wu-Tang Clan, Nas, 2Pac, Biggie, OutKast...
-- **2000s** : Jay-Z, Eminem, Kanye West, Lil Wayne...
-- **2010s** : Kendrick Lamar, Drake, Travis Scott, Tyler...
-- **2020s** : Pop Smoke, JID, Baby Keem, Yeat...
+### Pipeline complet (recommandé)
 
-### Rap FR (~80 artistes)
-- **Classiques** : IAM, NTM, Booba, Rohff, Oxmo Puccino...
-- **2010s** : Nekfeu, PNL, Damso, Orelsan, SCH...
-- **2020s** : Freeze Corleone, Gazo, Ziak, Isha, Limsa...
+```bash
+# Test rapide (10 artistes)
+npm run import:full -- --test
 
-### Belgique & Suisse
-- Hamza, Damso, Roméo Elvis, Di-Meh, Slimka...
+# Artistes rap
+npm run import:full -- --artists
+
+# Tous les genres
+npm run import:full -- --all
+
+# Depuis une playlist
+npm run import:full -- --playlist=37i9dQZF1DX0XUsuxWHRQd
+```
+
+### Étape par étape
+
+```bash
+# Phase 1: Extract (Spotify)
+npm run extract -- --test
+npm run extract -- --artists
+npm run extract -- --extended
+npm run extract -- --all
+npm run extract -- --genre=rap-fr
+npm run extract -- --playlist=ID
+npm run extract -- --new-releases
+
+# Phase 2: Enrich (MusicBrainz)
+npm run enrich:mb -- --latest
+npm run enrich:mb -- --latest --countries=FR,US
+
+# Phase 3: Enrich (Covers)
+npm run enrich:covers -- --latest
+
+# Phase 4: Load (Supabase)
+npm run load -- --latest
+npm run load -- --latest --dry-run
+```
+
+### Utilitaires
+
+```bash
+# Voir le statut des pipelines
+npm run pipeline:status
+```
+
+## Workflow
+
+```
+┌─────────────────┐
+│  PHASE 1        │
+│  extract        │ ──► data/pipeline_*.json (status: extracted)
+│  (Spotify)      │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│  PHASE 2        │
+│  enrich:mb      │ ──► Ajoute: musicbrainz.*, vinyls[]
+│  (MusicBrainz)  │     (status: enriched_mb ou skipped)
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│  PHASE 3        │
+│  enrich:covers  │ ──► Ajoute: vinyls[].cover_url
+│  (Cover Art)    │     (status: enriched_covers)
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│  PHASE 4        │
+│  load           │ ──► Insert albums & vinyls en BDD
+│  (Supabase)     │     (status: loaded)
+└─────────────────┘
+```
+
+## Genres disponibles
+
+### Rap (artists.ts)
+- `rap-us` : Rap américain
+- `rap-fr` : Rap français
+- `rap-be` : Rap belge
+- `rap-ch` : Rap suisse
+
+### Extended (artists-extended.ts)
+- `rock` : Rock classique → moderne
+- `metal` : Metal tous sous-genres
+- `soul` : Soul classique
+- `rnb` : R&B
+- `jazz` : Jazz classique + moderne
+- `electro` : Électro, house, techno
+- `reggae` : Reggae, dub
+- `chanson-fr` : Chanson française
+- `afro` : Afrobeats
+- `world` : Musiques du monde
+- `pop` : Pop internationale
+- `country` : Country, folk
+- `blues` : Blues
+
+## Données intermédiaires
+
+Le pipeline stocke les données dans `data/pipeline_*.json`:
+
+```json
+{
+  "phase": "enrich_mb",
+  "albums": [
+    {
+      "spotify": { "spotify_id": "...", "title": "...", ... },
+      "musicbrainz": { "release_group_id": "..." },
+      "vinyls": [
+        { "musicbrainz_release_id": "...", "country": "FR", ... }
+      ],
+      "status": "enriched_mb"
+    }
+  ],
+  "stats": { "total_extracted": 100, "total_with_vinyls": 42, ... }
+}
+```
+
+Cela permet:
+- Reprise en cas d'interruption
+- Inspection/debug des données
+- Modification manuelle si nécessaire
 
 ## Troubleshooting
 
-### "Rate limit exceeded" (MusicBrainz)
-MusicBrainz limite à 1 requête/seconde. Le script gère ça automatiquement, mais si vous voyez ce message, attendez quelques secondes.
+### "Rate limit" MusicBrainz
+Normal, le script gère automatiquement (1 req/sec).
 
-### "Artiste non trouvé sur Spotify"
-Vérifiez l'orthographe dans `config/artists.ts`. Spotify est sensible aux caractères spéciaux.
+### "Artiste non trouvé"
+Vérifiez l'orthographe dans les fichiers config/*.ts
 
-### "Aucun pressage vinyle FR trouvé"
-Normal pour beaucoup d'albums! Seuls certains ont des pressages français. Vous pouvez changer le pays avec `--country=US`.
-
-## Ajout de nouveaux genres
-
-1. Créer un nouveau tableau dans `config/artists.ts`
-2. Ajouter le genre aux exports `ALL_*`
-3. Relancer `npm run import:albums -- --genre=nouveau-genre`
+### Aucun vinyle trouvé
+Essayez avec plus de pays: `--countries=FR,DE,UK,US,JP`
 
 ## Licence
 

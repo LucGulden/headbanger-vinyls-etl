@@ -1,277 +1,146 @@
 /**
  * Client MusicBrainz API
- * Documentation: https://musicbrainz.org/doc/MusicBrainz_API
+ * Rate limit: 1 requête/seconde
  */
 
-import { config } from '../../config/settings';
+import { config } from '../../config/settings.js';
+import type { VinylData } from './types.js';
 
-// Types MusicBrainz
-export interface MBReleaseGroup {
-  id: string;
-  title: string;
-  'primary-type'?: string;
-  'secondary-types'?: string[];
-  'first-release-date'?: string;
-  'artist-credit'?: MBArtistCredit[];
-}
-
-export interface MBRelease {
-  id: string;
-  title: string;
-  status?: string;
-  date?: string;
-  country?: string;
-  'release-events'?: MBReleaseEvent[];
-  'label-info'?: MBLabelInfo[];
-  media?: MBMedia[];
-  'artist-credit'?: MBArtistCredit[];
-  'release-group'?: MBReleaseGroup;
-  barcode?: string;
-}
-
-export interface MBReleaseEvent {
-  date?: string;
-  area?: { name: string; 'iso-3166-1-codes'?: string[] };
-}
-
-export interface MBLabelInfo {
-  'catalog-number'?: string;
-  label?: { id: string; name: string };
-}
-
-export interface MBMedia {
-  format?: string;
-  'track-count'?: number;
-  position?: number;
-}
-
-export interface MBArtistCredit {
-  name?: string;
-  artist: { id: string; name: string };
-  joinphrase?: string;
-}
-
-export interface MBSearchResult<T> {
-  count: number;
-  offset: number;
-  releases?: T[];
-  'release-groups'?: T[];
-}
-
-// Rate limiter
+// Rate limiting
 let lastRequestTime = 0;
+const MIN_DELAY = 1100;
 
-async function rateLimitedFetch(url: string): Promise<Response> {
+async function mbFetch<T>(url: string): Promise<T> {
   const now = Date.now();
-  const timeSinceLastRequest = now - lastRequestTime;
-
-  if (timeSinceLastRequest < config.musicBrainz.rateLimitMs) {
-    await sleep(config.musicBrainz.rateLimitMs - timeSinceLastRequest);
-  }
-
+  const elapsed = now - lastRequestTime;
+  if (elapsed < MIN_DELAY) await sleep(MIN_DELAY - elapsed);
   lastRequestTime = Date.now();
 
   const response = await fetch(url, {
     headers: {
-      'User-Agent': config.musicBrainz.userAgent,
+      'User-Agent': `FillCrate/2.0 (${config.musicbrainz.userAgent})`,
       Accept: 'application/json',
     },
   });
 
-  if (response.status === 503) {
-    // Rate limited, attendre et réessayer
-    console.log('⏳ MusicBrainz rate limit, waiting 2s...');
+  if (response.status === 503 || response.status === 429) {
     await sleep(2000);
-    return rateLimitedFetch(url);
+    return mbFetch(url);
   }
 
-  return response;
-}
-
-/**
- * Effectue une requête à l'API MusicBrainz
- */
-async function mbFetch<T>(endpoint: string): Promise<T> {
-  const url = `${config.musicBrainz.apiBaseUrl}${endpoint}`;
-  const response = await rateLimitedFetch(url);
-
-  if (!response.ok) {
-    throw new Error(`MusicBrainz API error: ${response.status} - ${await response.text()}`);
-  }
-
+  if (!response.ok) throw new Error(`MusicBrainz error: ${response.status}`);
   return response.json();
 }
 
-/**
- * Recherche des releases (pressages) par UPC/barcode
- */
-export async function searchReleasesByBarcode(barcode: string): Promise<MBRelease[]> {
-  const result = await mbFetch<MBSearchResult<MBRelease>>(
-    `/release?query=barcode:${barcode}&fmt=json`
-  );
-  return result.releases || [];
-}
-
-/**
- * Recherche des releases par artiste + titre d'album
- */
-export async function searchReleases(
-  artist: string,
-  album: string,
-  options: { country?: string; format?: string } = {}
-): Promise<MBRelease[]> {
-  const artistEncoded = encodeURIComponent(artist);
-  const albumEncoded = encodeURIComponent(album);
-
-  let query = `artist:"${artistEncoded}" AND release:"${albumEncoded}"`;
-
-  if (options.country) {
-    query += ` AND country:${options.country}`;
-  }
-
-  if (options.format) {
-    query += ` AND format:"${options.format}"`;
-  }
-
-  const result = await mbFetch<MBSearchResult<MBRelease>>(
-    `/release?query=${encodeURIComponent(query)}&fmt=json&limit=100`
-  );
-
-  return result.releases || [];
-}
-
-/**
- * Recherche des Release Groups (équivalent d'un Album abstrait)
- */
-export async function searchReleaseGroups(
-  artist: string,
-  album: string
-): Promise<MBReleaseGroup[]> {
-  const artistEncoded = encodeURIComponent(artist);
-  const albumEncoded = encodeURIComponent(album);
-
-  const query = `artist:"${artistEncoded}" AND releasegroup:"${albumEncoded}"`;
-
-  const result = await mbFetch<MBSearchResult<MBReleaseGroup>>(
-    `/release-group?query=${encodeURIComponent(query)}&fmt=json&limit=20`
-  );
-
-  return result['release-groups'] || [];
-}
-
-/**
- * Récupère toutes les releases d'un Release Group
- */
-export async function getReleaseGroupReleases(
-  releaseGroupId: string,
-  options: { country?: string } = {}
-): Promise<MBRelease[]> {
-  let url = `/release?release-group=${releaseGroupId}&fmt=json&limit=100&inc=labels+media+release-groups`;
-
-  const response = await mbFetch<MBSearchResult<MBRelease>>(url);
-  let releases = response.releases || [];
-
-  // Filtrer par pays si spécifié
-  if (options.country) {
-    releases = releases.filter((r) => r.country === options.country);
-  }
-
-  return releases;
-}
-
-/**
- * Récupère les détails complets d'une release
- */
-export async function getReleaseDetails(releaseId: string): Promise<MBRelease> {
-  return mbFetch<MBRelease>(
-    `/release/${releaseId}?fmt=json&inc=labels+media+artist-credits+release-groups`
-  );
-}
-
-/**
- * Filtre les releases pour ne garder que les vinyles
- */
-export function filterVinylReleases(releases: MBRelease[]): MBRelease[] {
-  return releases.filter((release) => {
-    if (!release.media) return false;
-    return release.media.some((m) =>
-      config.import.vinylFormats.some((format) =>
-        m.format?.toLowerCase().includes(format.toLowerCase().replace(/"/g, ''))
-      )
-    );
-  });
-}
-
-/**
- * Extrait l'artiste principal d'un artist-credit
- */
-export function extractArtist(credits?: MBArtistCredit[]): string {
-  if (!credits?.length) return 'Unknown Artist';
-  return credits.map((c) => c.name || c.artist.name).join('');
-}
-
-/**
- * Extrait le format complet des media
- */
-export function extractFormat(media?: MBMedia[]): string | undefined {
-  if (!media?.length) return undefined;
-  const formats = media.map((m) => m.format).filter(Boolean);
-  if (formats.length === 0) return undefined;
-  if (formats.length === 1) return formats[0];
-  // Si plusieurs médias, formatter comme "2xLP"
-  const formatCounts: Record<string, number> = {};
-  formats.forEach((f) => {
-    formatCounts[f!] = (formatCounts[f!] || 0) + 1;
-  });
-  return Object.entries(formatCounts)
-    .map(([format, count]) => (count > 1 ? `${count}x${format}` : format))
-    .join(' + ');
-}
-
-/**
- * Extrait le label et catalog number
- */
-export function extractLabelInfo(labelInfo?: MBLabelInfo[]): {
-  label?: string;
-  catalogNumber?: string;
-} {
-  if (!labelInfo?.length) return {};
-  const first = labelInfo[0];
-  return {
-    label: first.label?.name,
-    catalogNumber: first['catalog-number'],
-  };
-}
-
-/**
- * Extrait l'année d'une date
- */
-export function extractYear(date?: string): number | undefined {
-  if (!date) return undefined;
-  const year = parseInt(date.split('-')[0], 10);
-  return isNaN(year) ? undefined : year;
-}
-
-/**
- * Convertit une release MusicBrainz en format Vinyl pour la BDD
- */
-export function mbReleaseToDbVinyl(release: MBRelease, albumId: string) {
-  const { label, catalogNumber } = extractLabelInfo(release['label-info']);
-
-  return {
-    album_id: albumId,
-    musicbrainz_release_id: release.id,
-    title: release.title,
-    artist: extractArtist(release['artist-credit']),
-    year: extractYear(release.date),
-    label,
-    catalog_number: catalogNumber,
-    country: release.country,
-    format: extractFormat(release.media),
-  };
-}
-
-// Helper
 function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function normalize(text: string): string {
+  return text.replace(/['']/g, "'").replace(/[""]/g, '"').replace(/&/g, 'and').trim();
+}
+
+function isVinyl(format?: string): boolean {
+  if (!format) return false;
+  const f = format.toLowerCase();
+  return f.includes('vinyl') || f.includes('12"') || f.includes('10"') || f.includes('7"') || f === 'lp';
+}
+
+// Types
+interface MBReleaseGroup {
+  id: string;
+  title: string;
+}
+
+interface MBRelease {
+  id: string;
+  title: string;
+  date?: string;
+  country?: string;
+  barcode?: string;
+  media?: { format?: string }[];
+  'label-info'?: { 'catalog-number'?: string; label?: { name: string } }[];
+}
+
+// Public API
+export async function searchReleaseGroup(
+  artist: string,
+  title: string
+): Promise<{ id: string; title: string } | null> {
+  const query = encodeURIComponent(
+    `artist:"${normalize(artist)}" AND releasegroup:"${normalize(title)}"`
+  );
+
+  try {
+    const result = await mbFetch<{ 'release-groups': MBReleaseGroup[] }>(
+      `https://musicbrainz.org/ws/2/release-group?query=${query}&limit=5&fmt=json`
+    );
+
+    if (!result['release-groups']?.length) return null;
+
+    const normalized = title.toLowerCase().trim();
+    const exact = result['release-groups'].find(
+      rg => rg.title.toLowerCase().trim() === normalized
+    );
+
+    const match = exact || result['release-groups'][0];
+    return { id: match.id, title: match.title };
+  } catch {
+    return null;
+  }
+}
+
+export async function getVinylReleases(
+  releaseGroupId: string,
+  countries?: string[]
+): Promise<VinylData[]> {
+  try {
+    const result = await mbFetch<{ releases: MBRelease[] }>(
+      `https://musicbrainz.org/ws/2/release?release-group=${releaseGroupId}&inc=labels+media&limit=100&fmt=json`
+    );
+
+    if (!result.releases) return [];
+
+    const vinyls: VinylData[] = [];
+
+    for (const release of result.releases) {
+      const hasVinyl = release.media?.some(m => isVinyl(m.format));
+      if (!hasVinyl) continue;
+
+      if (countries?.length && (!release.country || !countries.includes(release.country))) {
+        continue;
+      }
+
+      const labelInfo = release['label-info']?.[0];
+      const format = release.media?.find(m => isVinyl(m.format))?.format;
+      const year = release.date ? parseInt(release.date.split('-')[0]) : undefined;
+
+      vinyls.push({
+        musicbrainz_release_id: release.id,
+        title: release.title,
+        country: release.country,
+        year: isNaN(year!) ? undefined : year,
+        label: labelInfo?.label?.name,
+        catalog_number: labelInfo?.['catalog-number'],
+        barcode: release.barcode,
+        format,
+      });
+    }
+
+    return vinyls;
+  } catch {
+    return [];
+  }
+}
+
+export async function searchAlbumVinyls(
+  artist: string,
+  title: string,
+  countries?: string[]
+): Promise<{ releaseGroup: { id: string; title: string } | null; vinyls: VinylData[] }> {
+  const releaseGroup = await searchReleaseGroup(artist, title);
+  if (!releaseGroup) return { releaseGroup: null, vinyls: [] };
+
+  const vinyls = await getVinylReleases(releaseGroup.id, countries);
+  return { releaseGroup, vinyls };
 }

@@ -1,0 +1,111 @@
+/**
+ * Phase 3: ENRICH - Récupération des covers (Cover Art Archive)
+ *
+ * Usage:
+ *   npm run enrich:covers -- --latest
+ *   npm run enrich:covers -- --file=data/pipeline_*.json
+ */
+
+import { getCoverUrl } from './utils/coverart.js';
+import {
+  loadPipelineState,
+  savePipelineState,
+  findLatestPipeline,
+  recalculateStats,
+  printPipelineStats,
+} from './utils/json-store.js';
+
+function parseArgs(): Record<string, string | boolean> {
+  const args: Record<string, string | boolean> = {};
+  process.argv.slice(2).forEach(arg => {
+    if (arg.startsWith('--')) {
+      const [key, value] = arg.slice(2).split('=');
+      args[key.replace(/-([a-z])/g, (_, l) => l.toUpperCase())] = value ?? true;
+    }
+  });
+  return args;
+}
+
+async function main() {
+  console.log('═══════════════════════════════════════════════════════════════');
+  console.log('   FillCrate - Phase 3: ENRICH (Cover Art Archive)');
+  console.log('═══════════════════════════════════════════════════════════════');
+
+  const args = parseArgs();
+
+  let filename: string | null = null;
+  if (args.file) {
+    filename = (args.file as string).replace('data/', '');
+  } else if (args.latest) {
+    filename = findLatestPipeline();
+    if (!filename) { console.log('\n⚠️ Aucun fichier pipeline trouvé'); return; }
+  } else {
+    console.log('\n⚠️ Utilisez --latest ou --file=...');
+    return;
+  }
+
+  console.log(`\n📂 Fichier: ${filename}`);
+
+  const state = loadPipelineState(filename);
+  if (!state) { console.error(`❌ Fichier non trouvé`); process.exit(1); }
+
+  // Collect vinyls without cover
+  const toProcess: { albumIdx: number; vinylIdx: number; releaseId: string }[] = [];
+  state.albums.forEach((album, ai) => {
+    album.vinyls.forEach((vinyl, vi) => {
+      if (!vinyl.cover_url) {
+        toProcess.push({ albumIdx: ai, vinylIdx: vi, releaseId: vinyl.musicbrainz_release_id });
+      }
+    });
+  });
+
+  console.log(`   ${toProcess.length} vinyles sans cover\n`);
+
+  if (!toProcess.length) {
+    console.log('   ✅ Tous les vinyles ont une cover');
+    return;
+  }
+
+  let processed = 0;
+  let found = 0;
+
+  for (const item of toProcess) {
+    processed++;
+    const vinyl = state.albums[item.albumIdx].vinyls[item.vinylIdx];
+    const album = state.albums[item.albumIdx];
+
+    process.stdout.write(`\r   [${processed}/${toProcess.length}] ${album.spotify.artist.substring(0, 15)} - ${vinyl.title.substring(0, 20).padEnd(20)}`);
+
+    const coverUrl = await getCoverUrl(item.releaseId);
+    if (coverUrl) {
+      vinyl.cover_url = coverUrl;
+      found++;
+    }
+
+    if (processed % 50 === 0) {
+      recalculateStats(state);
+      savePipelineState(filename, state);
+    }
+  }
+
+  // Update status
+  for (const album of state.albums) {
+    if (album.status === 'enriched_mb' && album.vinyls.some(v => v.cover_url)) {
+      album.status = 'enriched_covers';
+    }
+  }
+
+  state.phase = 'enrich_covers';
+  recalculateStats(state);
+  savePipelineState(filename, state);
+
+  console.log('\n');
+  console.log(`   ✅ Covers trouvées: ${found}/${toProcess.length}`);
+
+  printPipelineStats(state);
+
+  console.log('\n✨ Terminé!');
+  console.log('   Prochaine étape: npm run load -- --latest');
+}
+
+main().catch(e => { console.error('\n💥', e); process.exit(1); });

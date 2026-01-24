@@ -1,2 +1,2 @@
-# Ce fichier permet de garder le dossier data dans git
-# Les fichiers de progression sont ignorés par .gitignore
+# Ce dossier contient les fichiers JSON générés par le pipeline
+# Les fichiers pipeline_*.json sont ignorés par git

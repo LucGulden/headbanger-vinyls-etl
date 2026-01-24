@@ -13,7 +13,7 @@
  * Le script peut être interrompu avec Ctrl+C et reprendra où il en était.
  */
 
-import { validateConfig, config } from '../config/settings';
+import { validateConfig, config } from '../config/settings.js';
 import {
   getAllAlbumsWithSpotifyId,
   upsertVinyl,

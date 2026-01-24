@@ -1,261 +1,125 @@
 /**
- * Client Supabase et fonctions d'accès à la base de données
+ * Client Supabase
  */
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { config } from '../../config/settings';
+import { config } from '../../config/settings.js';
+import type { AlbumPipelineData } from './types.js';
 
-// Types pour la base de données FillCrate
-export interface Album {
-  id?: string;
-  spotify_id?: string;
-  musicbrainz_release_group_id?: string;
+let client: SupabaseClient | null = null;
+
+function getClient(): SupabaseClient {
+  if (!client) {
+    client = createClient(config.supabase.url, config.supabase.serviceRoleKey);
+  }
+  return client;
+}
+
+export async function albumExists(spotifyId: string, mbId: string): Promise<string | null> {
+  const { data } = await getClient()
+    .from('albums')
+    .select('id')
+    .or(`spotify_id.eq.${spotifyId},musicbrainz_release_group_id.eq.${mbId}`)
+    .limit(1)
+    .single();
+  return data?.id || null;
+}
+
+export async function vinylExists(mbId: string): Promise<boolean> {
+  const { data } = await getClient()
+    .from('vinyls')
+    .select('id')
+    .eq('musicbrainz_release_id', mbId)
+    .limit(1)
+    .single();
+  return !!data;
+}
+
+export async function insertAlbum(album: {
+  spotify_id: string;
+  spotify_url: string;
+  musicbrainz_release_group_id: string;
   title: string;
   artist: string;
   cover_url?: string;
   year?: number;
-  created_by?: string;
-  created_at?: string;
+}): Promise<string> {
+  const { data, error } = await getClient()
+    .from('albums')
+    .insert(album)
+    .select('id')
+    .single();
+  if (error) throw new Error(`Insert album failed: ${error.message}`);
+  return data.id;
 }
 
-export interface Vinyl {
-  id?: string;
+export async function insertVinyl(vinyl: {
   album_id: string;
-  musicbrainz_release_id?: string;
+  musicbrainz_release_id: string;
   title: string;
-  artist: string;
-  cover_url?: string;
+  country?: string;
   year?: number;
   label?: string;
   catalog_number?: string;
-  country?: string;
+  barcode?: string;
   format?: string;
-  created_by?: string;
-  created_at?: string;
-}
-
-// Client Supabase singleton
-let supabaseClient: SupabaseClient | null = null;
-
-export function getSupabaseClient(): SupabaseClient {
-  if (!supabaseClient) {
-    supabaseClient = createClient(
-      config.supabase.url,
-      config.supabase.serviceRoleKey,
-      {
-        auth: {
-          autoRefreshToken: false,
-          persistSession: false,
-        },
-      }
-    );
-  }
-  return supabaseClient;
-}
-
-// =============================================================================
-// ALBUMS
-// =============================================================================
-
-/**
- * Cherche un album par spotify_id
- */
-export async function findAlbumBySpotifyId(spotifyId: string): Promise<Album | null> {
-  const supabase = getSupabaseClient();
-  const { data, error } = await supabase
-    .from('albums')
-    .select('*')
-    .eq('spotify_id', spotifyId)
-    .single();
-
-  if (error && error.code !== 'PGRST116') {
-    throw error;
-  }
-  return data;
-}
-
-/**
- * Cherche un album par musicbrainz_release_group_id
- */
-export async function findAlbumByMusicBrainzId(mbId: string): Promise<Album | null> {
-  const supabase = getSupabaseClient();
-  const { data, error } = await supabase
-    .from('albums')
-    .select('*')
-    .eq('musicbrainz_release_group_id', mbId)
-    .single();
-
-  if (error && error.code !== 'PGRST116') {
-    throw error;
-  }
-  return data;
-}
-
-/**
- * Cherche un album par titre et artiste (fuzzy)
- */
-export async function findAlbumByTitleArtist(title: string, artist: string): Promise<Album | null> {
-  const supabase = getSupabaseClient();
-  const { data, error } = await supabase
-    .from('albums')
-    .select('*')
-    .ilike('title', title)
-    .ilike('artist', artist)
-    .limit(1)
-    .single();
-
-  if (error && error.code !== 'PGRST116') {
-    throw error;
-  }
-  return data;
-}
-
-/**
- * Insère un nouvel album
- */
-export async function insertAlbum(album: Omit<Album, 'id' | 'created_at'>): Promise<Album> {
-  const supabase = getSupabaseClient();
-  const { data, error } = await supabase
-    .from('albums')
-    .insert(album)
-    .select()
-    .single();
-
-  if (error) throw error;
-  return data;
-}
-
-/**
- * Met à jour un album existant
- */
-export async function updateAlbum(id: string, updates: Partial<Album>): Promise<Album> {
-  const supabase = getSupabaseClient();
-  const { data, error } = await supabase
-    .from('albums')
-    .update(updates)
-    .eq('id', id)
-    .select()
-    .single();
-
-  if (error) throw error;
-  return data;
-}
-
-/**
- * Upsert album (insert ou update si existe)
- */
-export async function upsertAlbum(album: Omit<Album, 'id' | 'created_at'>): Promise<Album> {
-  // Chercher d'abord par spotify_id
-  if (album.spotify_id) {
-    const existing = await findAlbumBySpotifyId(album.spotify_id);
-    if (existing) {
-      return updateAlbum(existing.id!, album);
-    }
-  }
-
-  // Sinon chercher par MusicBrainz ID
-  if (album.musicbrainz_release_group_id) {
-    const existing = await findAlbumByMusicBrainzId(album.musicbrainz_release_group_id);
-    if (existing) {
-      return updateAlbum(existing.id!, album);
-    }
-  }
-
-  // Sinon insérer
-  return insertAlbum(album);
-}
-
-// =============================================================================
-// VINYLS
-// =============================================================================
-
-/**
- * Cherche un vinyl par musicbrainz_release_id
- */
-export async function findVinylByMusicBrainzId(mbId: string): Promise<Vinyl | null> {
-  const supabase = getSupabaseClient();
-  const { data, error } = await supabase
-    .from('vinyls')
-    .select('*')
-    .eq('musicbrainz_release_id', mbId)
-    .single();
-
-  if (error && error.code !== 'PGRST116') {
-    throw error;
-  }
-  return data;
-}
-
-/**
- * Insère un nouveau vinyl
- */
-export async function insertVinyl(vinyl: Omit<Vinyl, 'id' | 'created_at'>): Promise<Vinyl> {
-  const supabase = getSupabaseClient();
-  const { data, error } = await supabase
+  cover_url?: string;
+}): Promise<string> {
+  const { data, error } = await getClient()
     .from('vinyls')
     .insert(vinyl)
-    .select()
+    .select('id')
     .single();
-
-  if (error) throw error;
-  return data;
+  if (error) throw new Error(`Insert vinyl failed: ${error.message}`);
+  return data.id;
 }
 
-/**
- * Met à jour un vinyl existant
- */
-export async function updateVinyl(id: string, updates: Partial<Vinyl>): Promise<Vinyl> {
-  const supabase = getSupabaseClient();
-  const { data, error } = await supabase
-    .from('vinyls')
-    .update(updates)
-    .eq('id', id)
-    .select()
-    .single();
+export async function loadAlbumWithVinyls(
+  albumData: AlbumPipelineData
+): Promise<{ albumId: string; vinylCount: number } | null> {
+  if (!albumData.musicbrainz || albumData.vinyls.length === 0) return null;
 
-  if (error) throw error;
-  return data;
-}
+  // Check existing
+  const existingId = await albumExists(
+    albumData.spotify.spotify_id,
+    albumData.musicbrainz.release_group_id
+  );
 
-/**
- * Upsert vinyl
- */
-export async function upsertVinyl(vinyl: Omit<Vinyl, 'id' | 'created_at'>): Promise<Vinyl> {
-  if (vinyl.musicbrainz_release_id) {
-    const existing = await findVinylByMusicBrainzId(vinyl.musicbrainz_release_id);
-    if (existing) {
-      return updateVinyl(existing.id!, vinyl);
-    }
+  let albumId: string;
+
+  if (existingId) {
+    albumId = existingId;
+  } else {
+    albumId = await insertAlbum({
+      spotify_id: albumData.spotify.spotify_id,
+      spotify_url: albumData.spotify.spotify_url,
+      musicbrainz_release_group_id: albumData.musicbrainz.release_group_id,
+      title: albumData.spotify.title,
+      artist: albumData.spotify.artist,
+      cover_url: albumData.spotify.cover_url,
+      year: albumData.spotify.year,
+    });
   }
-  return insertVinyl(vinyl);
-}
 
-/**
- * Récupère tous les vinyls sans cover_url
- */
-export async function getVinylsWithoutCover(limit = 100): Promise<Vinyl[]> {
-  const supabase = getSupabaseClient();
-  const { data, error } = await supabase
-    .from('vinyls')
-    .select('*')
-    .is('cover_url', null)
-    .not('musicbrainz_release_id', 'is', null)
-    .limit(limit);
+  let vinylCount = 0;
 
-  if (error) throw error;
-  return data || [];
-}
+  for (const vinyl of albumData.vinyls) {
+    if (await vinylExists(vinyl.musicbrainz_release_id)) continue;
 
-/**
- * Récupère tous les albums avec leur spotify_id pour le matching
- */
-export async function getAllAlbumsWithSpotifyId(): Promise<Album[]> {
-  const supabase = getSupabaseClient();
-  const { data, error } = await supabase
-    .from('albums')
-    .select('*')
-    .not('spotify_id', 'is', null);
+    await insertVinyl({
+      album_id: albumId,
+      musicbrainz_release_id: vinyl.musicbrainz_release_id,
+      title: vinyl.title,
+      country: vinyl.country,
+      year: vinyl.year,
+      label: vinyl.label,
+      catalog_number: vinyl.catalog_number,
+      barcode: vinyl.barcode,
+      format: vinyl.format,
+      cover_url: vinyl.cover_url,
+    });
+    vinylCount++;
+  }
 
-  if (error) throw error;
-  return data || [];
+  return { albumId, vinylCount };
 }

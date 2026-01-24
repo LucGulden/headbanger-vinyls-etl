@@ -1,224 +1,146 @@
 /**
- * Client Spotify API (Client Credentials Flow)
+ * Client Spotify API
  */
 
-import { config } from '../../config/settings';
+import { config } from '../../config/settings.js';
+import type { SpotifyAlbumData } from './types.js';
 
-// Types Spotify
-export interface SpotifyToken {
-  access_token: string;
-  token_type: string;
-  expires_in: number;
-  expires_at: number;
-}
-
-export interface SpotifyArtist {
+// Types
+interface SpotifyArtist { id: string; name: string; }
+interface SpotifyImage { url: string; height: number; }
+interface SpotifyAlbum {
   id: string;
   name: string;
-  uri: string;
-  external_urls: { spotify: string };
-  genres: string[];
-  popularity: number;
-  images: { url: string; height: number; width: number }[];
-}
-
-export interface SpotifyAlbum {
-  id: string;
-  name: string;
-  artists: { id: string; name: string }[];
+  artists: SpotifyArtist[];
   release_date: string;
-  release_date_precision: 'year' | 'month' | 'day';
-  total_tracks: number;
   album_type: 'album' | 'single' | 'compilation';
-  images: { url: string; height: number; width: number }[];
-  external_ids?: { upc?: string; isrc?: string };
+  images: SpotifyImage[];
   external_urls: { spotify: string };
-  uri: string;
 }
 
-export interface SpotifySearchResult {
-  artists?: { items: SpotifyArtist[]; total: number };
-  albums?: { items: SpotifyAlbum[]; total: number };
-}
+// Auth
+let accessToken: string | null = null;
+let tokenExpiry = 0;
 
-export interface SpotifyArtistAlbumsResult {
-  items: SpotifyAlbum[];
-  total: number;
-  next: string | null;
-}
-
-// Token cache
-let tokenCache: SpotifyToken | null = null;
-
-/**
- * Obtient un token d'accès Spotify (Client Credentials)
- */
 async function getAccessToken(): Promise<string> {
-  // Vérifier le cache
-  if (tokenCache && Date.now() < tokenCache.expires_at) {
-    return tokenCache.access_token;
-  }
+  if (accessToken && Date.now() < tokenExpiry - 60000) return accessToken;
 
   const credentials = Buffer.from(
     `${config.spotify.clientId}:${config.spotify.clientSecret}`
   ).toString('base64');
 
-  const response = await fetch(config.spotify.tokenUrl, {
+  const response = await fetch('https://accounts.spotify.com/api/token', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
       Authorization: `Basic ${credentials}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
     },
     body: 'grant_type=client_credentials',
   });
 
-  if (!response.ok) {
-    throw new Error(`Spotify token error: ${response.status}`);
-  }
+  if (!response.ok) throw new Error(`Spotify auth failed: ${response.status}`);
 
   const data = await response.json();
-
-  tokenCache = {
-    ...data,
-    expires_at: Date.now() + (data.expires_in - 60) * 1000, // Marge de 60s
-  };
-
-  return tokenCache.access_token;
+  accessToken = data.access_token;
+  tokenExpiry = Date.now() + data.expires_in * 1000;
+  return accessToken;
 }
 
-/**
- * Effectue une requête authentifiée à l'API Spotify
- */
 async function spotifyFetch<T>(endpoint: string): Promise<T> {
   const token = await getAccessToken();
-
-  const response = await fetch(`${config.spotify.apiBaseUrl}${endpoint}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+  const response = await fetch(`https://api.spotify.com/v1${endpoint}`, {
+    headers: { Authorization: `Bearer ${token}` },
   });
 
-  if (!response.ok) {
-    throw new Error(`Spotify API error: ${response.status} - ${await response.text()}`);
+  if (response.status === 429) {
+    const retryAfter = parseInt(response.headers.get('Retry-After') || '5');
+    await sleep(retryAfter * 1000);
+    return spotifyFetch(endpoint);
   }
 
+  if (!response.ok) throw new Error(`Spotify API error: ${response.status}`);
   return response.json();
 }
 
-/**
- * Recherche un artiste par nom
- */
-export async function searchArtist(name: string): Promise<SpotifyArtist | null> {
-  const encoded = encodeURIComponent(name);
-  const result = await spotifyFetch<SpotifySearchResult>(
-    `/search?q=${encoded}&type=artist&limit=5`
-  );
-
-  if (!result.artists?.items.length) {
-    return null;
-  }
-
-  // Chercher une correspondance exacte (case insensitive)
-  const exactMatch = result.artists.items.find(
-    (a) => a.name.toLowerCase() === name.toLowerCase()
-  );
-
-  return exactMatch || result.artists.items[0];
+function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-/**
- * Récupère tous les albums d'un artiste
- */
+// Conversion
+function toSpotifyAlbumData(album: SpotifyAlbum): SpotifyAlbumData {
+  const year = album.release_date ? parseInt(album.release_date.split('-')[0]) : undefined;
+  const cover = album.images.find(img => img.height === 300)?.url || album.images[0]?.url;
+
+  return {
+    spotify_id: album.id,
+    spotify_url: `https://open.spotify.com/album/${album.id}`,
+    title: album.name,
+    artist: album.artists.map(a => a.name).join(', '),
+    artist_id: album.artists[0]?.id || '',
+    cover_url: cover,
+    year: isNaN(year!) ? undefined : year,
+    album_type: album.album_type,
+    release_date: album.release_date,
+  };
+}
+
+// Public API
+export async function searchArtist(name: string): Promise<{ id: string; name: string } | null> {
+  const query = encodeURIComponent(name);
+  const result = await spotifyFetch<{ artists: { items: SpotifyArtist[] } }>(
+    `/search?q=${query}&type=artist&limit=1`
+  );
+  return result.artists.items[0] || null;
+}
+
 export async function getArtistAlbums(
   artistId: string,
-  includeGroups: string[] = ['album', 'single']
-): Promise<SpotifyAlbum[]> {
-  const albums: SpotifyAlbum[] = [];
-  const groups = includeGroups.join(',');
+  includeGroups = ['album', 'single']
+): Promise<SpotifyAlbumData[]> {
+  const albums: SpotifyAlbumData[] = [];
   let offset = 0;
-  const limit = 50;
 
   while (true) {
-    const result = await spotifyFetch<SpotifyArtistAlbumsResult>(
-      `/artists/${artistId}/albums?include_groups=${groups}&market=FR&limit=${limit}&offset=${offset}`
+    const result = await spotifyFetch<{ items: SpotifyAlbum[]; next: string | null }>(
+      `/artists/${artistId}/albums?include_groups=${includeGroups.join(',')}&market=FR&limit=50&offset=${offset}`
     );
 
-    albums.push(...result.items);
-
-    if (!result.next || result.items.length < limit) {
-      break;
+    for (const album of result.items) {
+      albums.push(toSpotifyAlbumData(album));
     }
 
-    offset += limit;
-
-    // Petit délai pour éviter le rate limiting
+    if (!result.next) break;
+    offset += 50;
     await sleep(100);
   }
 
   return albums;
 }
 
-/**
- * Récupère les détails complets d'un album (inclut UPC)
- */
-export async function getAlbumDetails(albumId: string): Promise<SpotifyAlbum> {
-  return spotifyFetch<SpotifyAlbum>(`/albums/${albumId}`);
-}
+export async function getPlaylistAlbums(playlistId: string): Promise<SpotifyAlbumData[]> {
+  const albums: SpotifyAlbumData[] = [];
+  const seen = new Set<string>();
+  let offset = 0;
 
-/**
- * Récupère les new releases
- */
-export async function getNewReleases(limit = 50, country = 'FR'): Promise<SpotifyAlbum[]> {
-  const result = await spotifyFetch<{ albums: { items: SpotifyAlbum[] } }>(
-    `/browse/new-releases?country=${country}&limit=${limit}`
-  );
-  return result.albums.items;
-}
+  while (true) {
+    const result = await spotifyFetch<{
+      items: { track: { album: SpotifyAlbum } | null }[];
+      next: string | null;
+    }>(
+      `/playlists/${playlistId}/tracks?market=FR&limit=100&offset=${offset}`
+    );
 
-/**
- * Recherche des albums
- */
-export async function searchAlbums(query: string, limit = 20): Promise<SpotifyAlbum[]> {
-  const encoded = encodeURIComponent(query);
-  const result = await spotifyFetch<SpotifySearchResult>(
-    `/search?q=${encoded}&type=album&limit=${limit}`
-  );
-  return result.albums?.items || [];
-}
+    for (const item of result.items) {
+      if (item.track?.album && !seen.has(item.track.album.id)) {
+        seen.add(item.track.album.id);
+        albums.push(toSpotifyAlbumData(item.track.album));
+      }
+    }
 
-/**
- * Extrait l'année d'une date Spotify
- */
-export function extractYear(releaseDate: string): number | undefined {
-  if (!releaseDate) return undefined;
-  const year = parseInt(releaseDate.split('-')[0], 10);
-  return isNaN(year) ? undefined : year;
-}
+    if (!result.next) break;
+    offset += 100;
+    await sleep(100);
+  }
 
-/**
- * Extrait l'URL de cover la plus grande
- */
-export function extractCoverUrl(images: SpotifyAlbum['images']): string | undefined {
-  if (!images?.length) return undefined;
-  // Trier par taille décroissante et prendre la plus grande
-  const sorted = [...images].sort((a, b) => (b.height || 0) - (a.height || 0));
-  return sorted[0]?.url;
-}
-
-/**
- * Convertit un album Spotify en format Album pour la BDD
- */
-export function spotifyAlbumToDbAlbum(spotifyAlbum: SpotifyAlbum) {
-  return {
-    spotify_id: spotifyAlbum.id,
-    title: spotifyAlbum.name,
-    artist: spotifyAlbum.artists.map((a) => a.name).join(', '),
-    cover_url: extractCoverUrl(spotifyAlbum.images),
-    year: extractYear(spotifyAlbum.release_date),
-  };
-}
-
-// Helper
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  return albums;
 }

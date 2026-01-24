@@ -1,60 +1,26 @@
 /**
- * Configuration globale des scripts d'import
+ * Configuration globale des scripts FillCrate
  */
 
 import 'dotenv/config';
 
 export const config = {
-  // Supabase
   supabase: {
-    url: process.env.SUPABASE_URL!,
-    serviceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    url: process.env.SUPABASE_URL || '',
+    serviceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY || '',
   },
-
-  // Spotify API
   spotify: {
-    clientId: process.env.SPOTIFY_CLIENT_ID!,
-    clientSecret: process.env.SPOTIFY_CLIENT_SECRET!,
-    // Endpoints
-    tokenUrl: 'https://accounts.spotify.com/api/token',
-    apiBaseUrl: 'https://api.spotify.com/v1',
+    clientId: process.env.SPOTIFY_CLIENT_ID || '',
+    clientSecret: process.env.SPOTIFY_CLIENT_SECRET || '',
   },
-
-  // MusicBrainz API
-  musicBrainz: {
-    apiBaseUrl: 'https://musicbrainz.org/ws/2',
-    userAgent: 'FillCrate/0.1.0 (contact@fillcrate.com)', // Requis par MusicBrainz
-    // Rate limit: 1 requête par seconde
-    rateLimitMs: 1100,
+  musicbrainz: {
+    userAgent: process.env.MB_USER_AGENT || 'fillcrate@example.com',
   },
-
-  // Cover Art Archive
-  coverArtArchive: {
-    apiBaseUrl: 'https://coverartarchive.org',
-  },
-
-  // Configuration import
-  import: {
-    // Nombre d'artistes à traiter par batch
-    batchSize: parseInt(process.env.BATCH_SIZE || '10'),
-    // Délai entre requêtes API (ms)
-    apiDelayMs: parseInt(process.env.API_DELAY_MS || '1100'),
-    // Pays pour filtrer les pressages
-    vinylCountry: process.env.VINYL_COUNTRY || 'FR',
-    // Formats vinyles acceptés
-    vinylFormats: ['12" Vinyl', 'Vinyl', 'LP', '2xLP', '3xLP', '7" Vinyl', '10" Vinyl'],
-  },
-
-  // Fichiers de données
-  paths: {
-    dataDir: './data',
-    progressFile: './data/progress.json',
-    errorsFile: './data/errors.json',
-    albumsCache: './data/albums-cache.json',
+  vinyl: {
+    defaultCountries: (process.env.VINYL_COUNTRIES || 'FR,DE,UK,US').split(','),
   },
 };
 
-// Validation de la configuration
 export function validateConfig(): void {
   const required = [
     ['SUPABASE_URL', config.supabase.url],
@@ -67,5 +33,17 @@ export function validateConfig(): void {
 
   if (missing.length > 0) {
     throw new Error(`Variables d'environnement manquantes: ${missing.join(', ')}`);
+  }
+}
+
+export function validateSpotifyConfig(): void {
+  if (!config.spotify.clientId || !config.spotify.clientSecret) {
+    throw new Error('Variables manquantes: SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET');
+  }
+}
+
+export function validateSupabaseConfig(): void {
+  if (!config.supabase.url || !config.supabase.serviceRoleKey) {
+    throw new Error('Variables manquantes: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY');
   }
 }

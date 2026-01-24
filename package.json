@@ -1,13 +1,15 @@
 {
   "name": "fillcrate-scripts",
-  "version": "1.0.0",
-  "description": "Scripts de peuplement de la base de données FillCrate (Albums & Vinyls)",
+  "version": "2.0.0",
+  "description": "Scripts ETL pour peupler la base de données FillCrate (Albums & Vinyls)",
   "type": "module",
   "scripts": {
-    "import:albums": "tsx src/import-albums.ts",
-    "import:vinyls": "tsx src/import-vinyls.ts",
-    "fetch:covers": "tsx src/fetch-covers.ts",
-    "import:all": "npm run import:albums && npm run import:vinyls && npm run fetch-covers"
+    "extract": "tsx src/extract-spotify.ts",
+    "enrich:mb": "tsx src/enrich-musicbrainz.ts",
+    "enrich:covers": "tsx src/enrich-covers.ts",
+    "load": "tsx src/load-database.ts",
+    "import:full": "tsx src/import-full.ts",
+    "pipeline:status": "tsx src/pipeline-status.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.1",
