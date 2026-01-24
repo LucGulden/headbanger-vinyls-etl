@@ -81,13 +81,20 @@ npm run import:full -- --playlist=37i9dQZF1DX0XUsuxWHRQd
 
 ```bash
 # Phase 1: Extract (Spotify)
-npm run extract -- --test
-npm run extract -- --artists
-npm run extract -- --extended
-npm run extract -- --all
-npm run extract -- --genre=rap-fr
-npm run extract -- --playlist=ID
-npm run extract -- --new-releases
+# Options de filtrage
+npm run extract -- --test              # Artistes de test
+npm run extract -- --albums-only       # Exclure les singles (Recommandé)
+
+# Options de sources
+npm run extract -- --artists           # Liste Rap uniquement
+npm run extract -- --all               # Liste complète (Rap + Extended)
+npm run extract -- --genre=jazz        # Filtrer par genre dans les listes
+npm run extract -- --playlist=ID       # Extraire depuis une playlist spécifique
+npm run extract -- --new-releases      # Extraire les dernières sorties Spotify
+
+# Nouveautés (Bulk & Search)
+npm run extract -- --all-genres        # Boucle sur les genres (config/genres.ts)
+npm run extract -- --query="year:2024" # Recherche libre via l'API Spotify
 
 # Phase 2: Enrich (MusicBrainz)
 npm run enrich:mb -- --latest
