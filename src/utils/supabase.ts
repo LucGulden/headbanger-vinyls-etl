@@ -126,3 +126,16 @@ export async function loadAlbumWithVinyls(
 
   return { albumId, vinylCount };
 }
+
+export async function getAllExistingVinylReleaseIds(): Promise<Set<string>> {
+  const { data, error } = await getClient()
+    .from('vinyls')
+    .select('musicbrainz_release_id');
+  
+  if (error) {
+    console.warn(`⚠️ Impossible de charger les vinyls existants: ${error.message}`);
+    return new Set();
+  }
+  
+  return new Set(data?.map(v => v.musicbrainz_release_id) || []);
+}
