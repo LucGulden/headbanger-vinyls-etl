@@ -117,7 +117,10 @@ export async function getArtistAlbums(
   return albums;
 }
 
-export async function getPlaylistAlbums(playlistId: string): Promise<SpotifyAlbumData[]> {
+export async function getPlaylistAlbums(
+  playlistId: string,
+  includeGroups = ['album', 'single']
+): Promise<SpotifyAlbumData[]> {
   const albums: SpotifyAlbumData[] = [];
   const seen = new Set<string>();
   let offset = 0;
@@ -132,13 +135,47 @@ export async function getPlaylistAlbums(playlistId: string): Promise<SpotifyAlbu
 
     for (const item of result.items) {
       if (item.track?.album && !seen.has(item.track.album.id)) {
-        seen.add(item.track.album.id);
-        albums.push(toSpotifyAlbumData(item.track.album));
+        // Filtre basé sur le type d'album
+        if (includeGroups.includes(item.track.album.album_type)) {
+          seen.add(item.track.album.id);
+          albums.push(toSpotifyAlbumData(item.track.album));
+        }
       }
     }
 
     if (!result.next) break;
     offset += 100;
+    await sleep(100);
+  }
+
+  return albums;
+}
+
+export async function getNewReleases(
+  includeGroups = ['album', 'single']
+): Promise<SpotifyAlbumData[]> {
+  const albums: SpotifyAlbumData[] = [];
+  const seen = new Set<string>();
+
+  let offset = 0;
+
+  while (true) {
+    const result = await spotifyFetch<{albums: { items: SpotifyAlbum[]; next: string | null }}>(
+      `/browse/new-releases?market=FR&limit=50&offset=${offset}`
+    );
+
+    for (const item of result.albums.items) {
+      if (item && !seen.has(item.id)) {
+        // Filtre basé sur le type d'album
+        if (includeGroups.includes(item.album_type)) {
+          seen.add(item.id);
+          albums.push(toSpotifyAlbumData(item));
+        }
+      }
+    }
+
+    if (!result.albums.next) break;
+    offset += 50;
     await sleep(100);
   }
 

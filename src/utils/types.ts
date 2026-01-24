@@ -20,6 +20,7 @@ export interface PlaylistConfig {
   genre?: string;
   priority: 'high' | 'medium' | 'low';
   trackNewReleases?: boolean;
+  owner:string;
 }
 
 // =============================================================================
@@ -78,7 +79,7 @@ export interface PipelineState {
   // Metadata
   created_at: string;
   updated_at: string;
-  source: 'artists' | 'playlist';
+  source: 'artists' | 'playlist' | 'new-releases';
   source_details: string;
 
   // Phase tracking

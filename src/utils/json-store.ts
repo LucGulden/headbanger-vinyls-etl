@@ -51,7 +51,7 @@ export function findLatestPipeline(source?: string): string | null {
 // PIPELINE STATE
 // =============================================================================
 
-export function createPipelineState(source: 'artists' | 'playlist', details: string): PipelineState {
+export function createPipelineState(source: 'artists' | 'playlist' | 'new-releases', details: string): PipelineState {
   return {
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),

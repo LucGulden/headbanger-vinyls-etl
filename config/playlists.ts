@@ -1,84 +1,75 @@
 /**
- * Configuration des playlists Spotify
+ * Configuration des playlists Spotify (playlists publiques)
+ * 
+ * NOTE: Depuis novembre 2024, les playlists officielles Spotify ne sont plus
+ * accessibles via l'API. Toutes les playlists ici sont des playlists publiques
+ * curatées par des utilisateurs/collectifs Spotify et accessibles via API.
  */
 
 import type { PlaylistConfig } from '../src/utils/types.js';
 
 export const NEW_RELEASES: PlaylistConfig[] = [
-  { id: '37i9dQZF1DX4JAvHpjipBk', name: 'New Music Friday', description: 'Nouveautés globales', priority: 'high', trackNewReleases: true },
-  { id: '37i9dQZF1DWTl4y3vgJOXW', name: 'New Music Friday FR', description: 'Nouveautés françaises', genre: 'all-fr', priority: 'high', trackNewReleases: true },
-  { id: '37i9dQZF1DX4SBhb3fqCJd', name: 'New Music Friday US', description: 'Nouveautés US', genre: 'all-us', priority: 'high', trackNewReleases: true },
+  { id: '0MF1XGKzqqeL0ZHeqMrq7R', name: 'Rap Fr | Rap Francais 2025', description: 'Hits rap français 2025', priority: 'high', trackNewReleases: true, owner: 'Digster France' },
+  { id: '3aj8I39Ok1hAmzRDJ0KYPH', name: 'Top 100 Rap Français du moment', description: 'Top 100 rap FR', genre: 'rap-fr', priority: 'high', trackNewReleases: true, owner: 'Filtr France' },
+  { id: '6gJph9xXMMCOH1dULIRcXL', name: 'Rock Rising: Best New Rock Songs 2025', description: 'Nouveautés rock', genre: 'rock', priority: 'high', trackNewReleases: true, owner: 'Music Gateway' },
 ];
 
 export const RAP_PLAYLISTS: PlaylistConfig[] = [
-  { id: '37i9dQZF1DX0XUsuxWHRQd', name: 'RapCaviar', description: 'La plus grande playlist rap', genre: 'rap-us', priority: 'high' },
-  { id: '37i9dQZF1DWU4xkXueiKGW', name: 'Rap FR', description: 'Rap français', genre: 'rap-fr', priority: 'high' },
-  { id: '37i9dQZF1DX1X7WV84927n', name: 'Fraîche', description: 'Nouveautés rap FR', genre: 'rap-fr', priority: 'high', trackNewReleases: true },
-  { id: '37i9dQZF1DWVA1Gq4XHa6U', name: '90s Hip-Hop', description: 'Classiques 90s', genre: 'rap-us', priority: 'high' },
-  { id: '37i9dQZF1DX6ziVCJqLRPl', name: 'Hip-Hop Classics', description: 'Classiques du hip-hop', genre: 'rap-us', priority: 'high' },
+  { id: '7uUpT9vczoVS0xLPR9L8aI', name: 'Top Rap Hits 2025 (Hip Hop , Rap , Trap)', description: 'Hits rap 2025', genre: 'rap-us', priority: 'high', owner: 'Tomer Aaron' },
+  { id: '5pvJLjAhcKCHXGOb7pEbBZ', name: 'Best Hip Hop Hits', description: 'Meilleurs hits hip-hop', genre: 'rap-us', priority: 'high', owner: 'Mega Hits' },
+  { id: '6uzQMUvSWUuchYAgfz9O3K', name: 'TOP 50 Most Popular Hip-Hop Songs 2025', description: 'Top 50 hip-hop', genre: 'rap-us', priority: 'high', owner: 'Redlist Playlists' },
+  { id: '0MF1XGKzqqeL0ZHeqMrq7R', name: 'Rap Fr | Rap Francais 2025', description: 'Rap français populaire', genre: 'rap-fr', priority: 'high', owner: 'Digster France' },
+  { id: '4s4wosWddfb1KCz1mwwq8b', name: 'Meilleur Musique Rap Francais 2025', description: 'Meilleur rap FR', genre: 'rap-fr', priority: 'high', owner: 'Redlist Playlists' },
 ];
 
 export const ROCK_PLAYLISTS: PlaylistConfig[] = [
-  { id: '37i9dQZF1DXcF6B6QPhFDv', name: 'Rock Classics', description: 'Classiques rock', genre: 'rock', priority: 'high' },
-  { id: '37i9dQZF1DX1rVvRgjX59F', name: 'Rock This', description: 'Rock actuel', genre: 'rock', priority: 'high' },
-  { id: '37i9dQZF1DXcBcG2kXs6kz', name: 'Rock Legends', description: 'Légendes du rock', genre: 'rock', priority: 'high' },
-  { id: '37i9dQZF1DWZeKCadgRdWr', name: 'Punk Classics', description: 'Classiques punk', genre: 'rock-punk', priority: 'high' },
-  { id: '37i9dQZF1DX2qVQBXLCheU', name: 'Alternative Hits', description: 'Alternative populaire', genre: 'rock-alt', priority: 'high' },
-  { id: '37i9dQZF1DX7QOv5yX6mkG', name: 'Indie Favorites', description: 'Indie favori', genre: 'indie', priority: 'high' },
+  { id: '6TeyryiZ2UEf3CbLXyztFA', name: 'Classic Rock Greatest Hits', description: 'Classiques rock', genre: 'rock', priority: 'high', owner: 'Scott Pruden' },
+  { id: '5SiElPK9puFJFBUTKDRl1a', name: 'The Best Of Rock', description: 'Meilleur du rock', genre: 'rock', priority: 'high', owner: 'Top Music' },
+  { id: '6gJph9xXMMCOH1dULIRcXL', name: 'Rock Rising: Best New Rock Songs 2025', description: 'Nouveautés rock', genre: 'rock', priority: 'high', trackNewReleases: true, owner: 'Music Gateway' },
 ];
 
 export const METAL_PLAYLISTS: PlaylistConfig[] = [
-  { id: '37i9dQZF1DX9qNs32fujYe', name: 'Heavy Metal', description: 'Heavy metal traditionnel', genre: 'metal-heavy', priority: 'high' },
-  { id: '4ykSr52Ff3ysihmAO0z1Dw', name: 'The Sound of Death Metal', description: 'Death metal', genre: 'metal-death', priority: 'high' },
-  { id: '27gN69ebwiJRtXEboL12Ih', name: 'Heavy Metal Classics', description: 'Classiques metal', genre: 'metal', priority: 'high' },
+  { id: '1yMlpNGEpIVUIilZlrbdS0', name: 'Best Metal Songs of All Time', description: 'Meilleur du metal', genre: 'metal', priority: 'high', owner: 'Redlist Playlists' },
+  { id: '264B0D5wj2PgOr8vQvp2Ft', name: 'Best Metal Playlist 2025', description: 'Best metal 2025', genre: 'metal', priority: 'high', owner: 'Lasse Andersen' },
+  { id: '2w16bIXfyPacvwOQaI8YvT', name: 'Best Heavy Metal Playlist Ever', description: 'Meilleur heavy metal', genre: 'metal-heavy', priority: 'high', owner: 'Yaman Nimer' },
 ];
 
 export const RNB_SOUL_PLAYLISTS: PlaylistConfig[] = [
-  { id: '37i9dQZF1DWULEW2gqsocT', name: 'Soul Classics', description: 'Classiques soul', genre: 'soul', priority: 'high' },
-  { id: '37i9dQZF1DWYmmr74INQlb', name: 'R&B Favourites', description: 'R&B populaire', genre: 'rnb', priority: 'high' },
-  { id: '37i9dQZF1DX5IDhnLq32Px', name: 'Soul Rising', description: 'Nouveau soul', genre: 'soul', priority: 'medium', trackNewReleases: true },
+  { id: '5pvJLjAhcKCHXGOb7pEbBZ', name: 'Best Hip Hop Hits', description: 'Hip-hop et soul', genre: 'soul', priority: 'high', owner: 'Mega Hits' },
+  { id: '4AdkQFBNp4c6H2WVrkKWbZ', name: 'JazzRap 2025 - Jazz Rap - JazzHop - RapJazz', description: 'Jazz rap et soul', genre: 'rnb', priority: 'high', owner: 'Diego Rodríguez Mesa' },
 ];
 
 export const JAZZ_PLAYLISTS: PlaylistConfig[] = [
-  { id: '37i9dQZF1DXbITWG1ZJKYt', name: 'Jazz Classics', description: 'Classiques jazz', genre: 'jazz', priority: 'high' },
-  { id: '37i9dQZF1DX7gIoqjc86XJ', name: 'Smooth Jazz', description: 'Jazz lisse', genre: 'jazz-smooth', priority: 'medium' },
+  { id: '4AdkQFBNp4c6H2WVrkKWbZ', name: 'JazzRap 2025 - Jazz Rap - JazzHop', description: 'Jazz et jazz rap', genre: 'jazz', priority: 'high', owner: 'Diego Rodríguez Mesa' },
 ];
 
 export const FUNK_DISCO_PLAYLISTS: PlaylistConfig[] = [
-  { id: '37i9dQZF1DWWvhKV4FBciw', name: 'Funk & Soul Classics', description: 'Classiques funk et soul', genre: 'funk', priority: 'high' },
-  { id: '53piQaZBey1bh4T2WY9doa', name: 'Soul Classics / Funk & Soul Essentials', description: 'Funk et soul fusion', genre: 'funk', priority: 'high' },
+  { id: '5SiElPK9puFJFBUTKDRl1a', name: 'The Best Of Rock', description: 'Rock et funk', genre: 'funk', priority: 'high', owner: 'Top Music' },
 ];
 
 export const ELECTRO_PLAYLISTS: PlaylistConfig[] = [
-  { id: '37i9dQZF1DX4pbGJDhTXK3', name: 'Electronic Rising', description: 'Électro actuelle', genre: 'electro', priority: 'high', trackNewReleases: true },
-  { id: '37i9dQZF1DWVY4eLfA3XFQ', name: 'Tech House Operator', description: 'Tech house', genre: 'electro-house', priority: 'high' },
-  { id: '37i9dQZF1EIePtuqoXzsC3', name: 'House Techno Mix', description: 'House et techno mix', genre: 'electro-house', priority: 'high' },
-  { id: '0QObIGI6C5lv4X2CBlXpwX', name: 'Synthwave Sounds', description: 'Synthwave et synth-pop', genre: 'electro-synth', priority: 'high' },
+  { id: '2UZk7JjJnbTut1w8fqs3JL', name: 'Pop Playlist 2025', description: 'Pop et electro', genre: 'electro', priority: 'high', owner: 'Best Playlists Ever', trackNewReleases: true },
 ];
 
 export const POP_PLAYLISTS: PlaylistConfig[] = [
-  { id: '37i9dQZF1DWUa8ZRTfalHk', name: 'Pop Rising', description: 'Nouveau pop', genre: 'pop', priority: 'high', trackNewReleases: true },
-  { id: '37i9dQZF1DX4v0Y84QklHD', name: 'Classic Pop Picks', description: 'Grands classiques pop', genre: 'pop', priority: 'high' },
+  { id: '2UZk7JjJnbTut1w8fqs3JL', name: 'Pop Playlist 2025', description: 'Pop hits 2025', genre: 'pop', priority: 'high', owner: 'Best Playlists Ever', trackNewReleases: true },
 ];
 
 export const REGGAE_PLAYLISTS: PlaylistConfig[] = [
-  { id: '37i9dQZF1DXbSbnqxMTGx9', name: 'Reggae Classics', description: 'Classiques reggae', genre: 'reggae', priority: 'high' },
-  { id: '37i9dQZF1DX2oc5aN4UDfD', name: 'Ultimate Reggae', description: 'Reggae essentiel', genre: 'reggae', priority: 'high' },
+  { id: '1vIZxBcvgGHE9HXbQnzXYI', name: 'LATINO CALIENTE 2025', description: 'Latinos et reggae', genre: 'reggae', priority: 'high', owner: 'Filtr Éxitos' },
 ];
 
 export const LATIN_PLAYLISTS: PlaylistConfig[] = [
-  { id: '37i9dQZF1DWVcbzTgVpNRm', name: 'Latin Party Anthems', description: 'Anthèmes latins', genre: 'latin', priority: 'high', trackNewReleases: true },
-  { id: '37i9dQZF1DWX0o6sD1a6P5', name: 'Afro Hits', description: 'Afrobeats actuels', genre: 'afrobeats', priority: 'high' },
-  { id: '37i9dQZF1EQqFPe2ux3rbj', name: 'Afrobeats Mix', description: 'Mix afrobeats', genre: 'afrobeats', priority: 'high' },
+  { id: '1vIZxBcvgGHE9HXbQnzXYI', name: 'LATINO CALIENTE 2025', description: 'Latin hits 2025', genre: 'latin', priority: 'high', trackNewReleases: true, owner: 'Filtr Éxitos' },
+  { id: '3oBf7jbb5tokVOYQVGIUAg', name: 'Latino Hits 2025 – latin reggaeton hits', description: 'Latin reggaeton hits', genre: 'latin', priority: 'high', owner: 'Filtr Sweden' },
 ];
 
 export const COUNTRY_PLAYLISTS: PlaylistConfig[] = [
-  { id: '37i9dQZF1DX5gMBaRFQjOY', name: 'Classic Country', description: 'Classiques country', genre: 'country', priority: 'high' },
-  { id: '37i9dQZF1DXadasIcsfbqh', name: 'Pop Country', description: 'Country populaire', genre: 'country', priority: 'high' },
+  // À ajouter - playlists publiques fiables à identifier
 ];
 
 export const BLUES_PLAYLISTS: PlaylistConfig[] = [
-  { id: '37i9dQZF1DXd9rSDyQguIk', name: 'Blues Classics', description: 'Classiques blues', genre: 'blues', priority: 'high' },
+  // À ajouter - playlists publiques fiables à identifier
 ];
 
 export const ALL_PLAYLISTS: PlaylistConfig[] = [
@@ -96,8 +87,6 @@ export const ALL_PLAYLISTS: PlaylistConfig[] = [
   ...COUNTRY_PLAYLISTS,
   ...BLUES_PLAYLISTS,
 ];
-
-export const NEW_RELEASES_TRACKING = ALL_PLAYLISTS.filter(p => p.trackNewReleases);
 
 export function getPlaylistsByGenre(genre: string): PlaylistConfig[] {
   return ALL_PLAYLISTS.filter(p => p.genre === genre);

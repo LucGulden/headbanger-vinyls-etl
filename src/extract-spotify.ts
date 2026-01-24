@@ -13,8 +13,8 @@
 import { validateSpotifyConfig } from '../config/settings.js';
 import { ALL_ARTISTS } from '../config/artists.js';
 import { TEST_ARTISTS } from '../config/artists-test.js';
-import { ALL_PLAYLISTS, NEW_RELEASES_TRACKING, getPlaylistsByGenre } from '../config/playlists.js';
-import { searchArtist, getArtistAlbums, getPlaylistAlbums } from './utils/spotify.js';
+import { ALL_PLAYLISTS, getPlaylistsByGenre } from '../config/playlists.js';
+import { searchArtist, getArtistAlbums, getPlaylistAlbums, getNewReleases } from './utils/spotify.js';
 import {
   createPipelineState,
   savePipelineState,
@@ -79,7 +79,7 @@ async function extractFromArtists(artists: ArtistConfig[], sourceDetails: string
   console.log(`\n   📁 data/${filename}`);
 }
 
-async function extractFromPlaylists(playlists: PlaylistConfig[], sourceDetails: string): Promise<void> {
+async function extractFromPlaylists(playlists: PlaylistConfig[], sourceDetails: string, albumsOnly: boolean): Promise<void> {
   console.log(`\n📋 Extraction depuis ${playlists.length} playlist(s)...`);
 
   const filename = getPipelineFilename('playlist', sourceDetails);
@@ -89,7 +89,7 @@ async function extractFromPlaylists(playlists: PlaylistConfig[], sourceDetails: 
 
   for (const playlist of playlists) {
     console.log(`\n   📋 ${playlist.name}...`);
-    const albums = await getPlaylistAlbums(playlist.id);
+    const albums = await getPlaylistAlbums(playlist.id, albumsOnly ? ['album'] : ['album', 'single']);
     console.log(`      ${albums.length} albums`);
     for (const album of albums) {
       allAlbums.push(toAlbumPipeline(album));
@@ -105,6 +105,23 @@ async function extractFromPlaylists(playlists: PlaylistConfig[], sourceDetails: 
   console.log(`\n   📁 data/${filename}`);
 }
 
+async function extractFromNewReleases(sourceDetails: string, albumsOnly: boolean): Promise<void> {
+  console.log(`\n🆕 Extraction des nouvelles sorties...`);
+
+  const filename = getPipelineFilename('new-releases', sourceDetails);
+  const state = createPipelineState('new-releases', sourceDetails);
+
+  const albums = await getNewReleases(albumsOnly ? ['album'] : ['album', 'single']);
+  
+  state.albums = deduplicateAlbums(albums.map(album => toAlbumPipeline(album)));
+  recalculateStats(state);
+  savePipelineState(filename, state);
+
+  console.log(`\n   ✅ ${state.albums.length} nouvelles sorties trouvées`);
+  printPipelineStats(state);
+  console.log(`\n   📁 data/${filename}`);
+}
+
 async function main() {
   console.log('═══════════════════════════════════════════════════════════════');
   console.log('   FillCrate - Phase 1: EXTRACT (Spotify)');
@@ -113,31 +130,30 @@ async function main() {
   try { validateSpotifyConfig(); } catch (e) { console.error(`\n❌ ${(e as Error).message}`); process.exit(1); }
 
   const args = parseArgs();
+  const albumsOnly = !!args.albumsOnly;
 
   // Playlist modes
   if (args.playlist) {
     const id = args.playlist as string;
     const found = ALL_PLAYLISTS.find(p => p.id === id);
-    const playlists = found ? [found] : [{ id, name: 'Custom', description: '', priority: 'high' as const }];
-    await extractFromPlaylists(playlists, id);
+    const playlists = found ? [found] : [{ id, name: 'Custom', description: '', priority: 'high' as const, owner: ''}];
+    await extractFromPlaylists(playlists, id, albumsOnly);
     return;
   }
 
   if (args.newReleases) {
-    await extractFromPlaylists(NEW_RELEASES_TRACKING, 'new-releases');
+    await extractFromNewReleases('new-releases', albumsOnly);
     return;
   }
 
   if (args.playlistGenre) {
     const playlists = getPlaylistsByGenre(args.playlistGenre as string);
     if (!playlists.length) { console.log(`\n⚠️ Aucune playlist pour "${args.playlistGenre}"`); return; }
-    await extractFromPlaylists(playlists, `genre-${args.playlistGenre}`);
+    await extractFromPlaylists(playlists, `genre-${args.playlistGenre}`, albumsOnly);
     return;
   }
 
   // Artist modes
-  const albumsOnly = !!args.albumsOnly;
-
   // Mode --all: traiter artistes + playlists + new releases
   if (args.all) {
     console.log(`\n📊 Mode ALL: ${ALL_ARTISTS.length} artistes + ${ALL_PLAYLISTS.length} playlists`);
@@ -146,7 +162,10 @@ async function main() {
     await extractFromArtists(ALL_ARTISTS, 'all-artists', albumsOnly);
 
     // 2. Extraction depuis les playlists
-    await extractFromPlaylists(ALL_PLAYLISTS, 'all-playlists');
+    await extractFromPlaylists(ALL_PLAYLISTS, 'all-playlists', albumsOnly);
+
+    // 2. Extraction depuis les playlists
+    await extractFromNewReleases('all-playlists', albumsOnly);
 
     console.log('\n✨ Extraction terminée!');
     console.log('   Prochaine étape: npm run enrich:mb -- --latest');
