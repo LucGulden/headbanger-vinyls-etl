@@ -4,7 +4,6 @@
  * Usage:
  *   npm run import:full -- --test
  *   npm run import:full -- --artists
- *   npm run import:full -- --extended
  *   npm run import:full -- --all
  *   npm run import:full -- --playlist=ID
  */

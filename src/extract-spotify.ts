@@ -4,7 +4,6 @@
  * Usage:
  *   npm run extract -- --test
  *   npm run extract -- --artists
- *   npm run extract -- --extended
  *   npm run extract -- --all
  *   npm run extract -- --genre=rap-fr
  *   npm run extract -- --playlist=37i9dQZF1DX0XUsuxWHRQd
@@ -13,7 +12,6 @@
 
 import { validateSpotifyConfig } from '../config/settings.js';
 import { ALL_ARTISTS } from '../config/artists.js';
-import { ALL_EXTENDED_ARTISTS } from '../config/artists-extended.js';
 import { TEST_ARTISTS } from '../config/artists-test.js';
 import { ALL_PLAYLISTS, NEW_RELEASES_TRACKING, getPlaylistsByGenre } from '../config/playlists.js';
 import { searchArtist, getArtistAlbums, getPlaylistAlbums } from './utils/spotify.js';
@@ -143,8 +141,7 @@ async function main() {
   const albumsOnly = !!args.albumsOnly;
 
   if (args.test) { artists = TEST_ARTISTS; sourceDetails = 'test'; }
-  else if (args.all) { artists = [...ALL_ARTISTS, ...ALL_EXTENDED_ARTISTS]; sourceDetails = 'all'; }
-  else if (args.extended) { artists = ALL_EXTENDED_ARTISTS; sourceDetails = 'extended'; }
+  else if (args.all) { artists = ALL_ARTISTS; sourceDetails = 'all'; }
   else { artists = ALL_ARTISTS; sourceDetails = 'rap'; }
 
   if (args.genre) {
@@ -158,7 +155,7 @@ async function main() {
   }
 
   if (!artists.length) {
-    console.log('\n⚠️ Options: --test, --artists, --extended, --all, --genre=X, --playlist=ID');
+    console.log('\n⚠️ Options: --test, --artists, --all, --genre=X, --playlist=ID');
     return;
   }
 

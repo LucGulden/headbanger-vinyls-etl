@@ -7,8 +7,7 @@ Pipeline ETL pour peupler la base de données FillCrate (Albums & Vinyls).
 ```
 fillcrate-scripts/
 ├── config/
-│   ├── artists.ts           # ~170 artistes rap US/FR
-│   ├── artists-extended.ts  # ~200 artistes autres genres
+│   ├── artists.ts           # ~170 artistes rap US/FR & ~200 artistes autres genres
 │   ├── artists-test.ts      # 10 artistes de test
 │   ├── playlists.ts         # Playlists Spotify configurées
 │   └── settings.ts          # Configuration
@@ -86,8 +85,8 @@ npm run extract -- --test              # Artistes de test
 npm run extract -- --albums-only       # Exclure les singles (Recommandé)
 
 # Options de sources
-npm run extract -- --artists           # Liste Rap uniquement
-npm run extract -- --all               # Liste complète (Rap + Extended)
+npm run extract -- --artists           # Liste Artistes
+npm run extract -- --all               # Liste complète (Artistes + Playlist + new-releases)
 npm run extract -- --genre=jazz        # Filtrer par genre dans les listes
 npm run extract -- --playlist=ID       # Extraire depuis une playlist spécifique
 npm run extract -- --new-releases      # Extraire les dernières sorties Spotify
@@ -148,13 +147,11 @@ npm run pipeline:status
 
 ## Genres disponibles
 
-### Rap (artists.ts)
+### Artists.ts
 - `rap-us` : Rap américain
 - `rap-fr` : Rap français
 - `rap-be` : Rap belge
 - `rap-ch` : Rap suisse
-
-### Extended (artists-extended.ts)
 - `rock` : Rock classique → moderne
 - `metal` : Metal tous sous-genres
 - `soul` : Soul classique
