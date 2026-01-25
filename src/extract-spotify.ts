@@ -156,7 +156,7 @@ async function main() {
   // Artist modes
   // Mode --all: traiter artistes + playlists + new releases
   if (args.all) {
-    console.log(`\n📊 Mode ALL: ${ALL_ARTISTS.length} artistes + ${ALL_PLAYLISTS.length} playlists`);
+    console.log(`\n📊 Mode ALL: ${ALL_ARTISTS.length} artistes + ${ALL_PLAYLISTS.length} playlists + nouvelles sorties`);
 
     // 1. Extraction depuis les artistes
     await extractFromArtists(ALL_ARTISTS, 'all-artists', albumsOnly);
