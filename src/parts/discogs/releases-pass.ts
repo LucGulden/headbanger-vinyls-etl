@@ -13,7 +13,6 @@ import { createWriteStream } from 'node:fs';
 import { mkdir, stat, unlink } from 'node:fs/promises';
 import { dirname } from 'node:path';
 import { Stage01DiscogsReleaseSchema } from '../../config/schemas.js';
-import { SAFETY_LIMITS } from '../../config/scope.js';
 import {
   loadCheckpoint,
   saveCheckpoint,
@@ -179,14 +178,10 @@ export async function runReleasesPass(
         });
       }
 
-      // Safety net
-      if (stats.accepted >= SAFETY_LIMITS.maxVinyls) {
-        log.error(
-          { accepted: stats.accepted, limit: SAFETY_LIMITS.maxVinyls },
-          'SAFETY_LIMITS.maxVinyls reached — aborting',
-        );
-        break;
-      }
+      // No safety cap here — Part 2 is raw extraction. The real
+      // filtering down to a Supabase-sized dataset happens in Part 4
+      // (FR-artist cross-resolution via MusicBrainz) and Part 7 (load).
+      // Use `--limit N` if you want to cap a dev run explicitly.
 
       if (opts.limit !== undefined && stats.processed >= opts.limit) {
         log.info({ limit: opts.limit }, 'limit reached — stopping');
