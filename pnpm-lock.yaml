@@ -20,6 +20,9 @@ importers:
       pino-pretty:
         specifier: ^11.2.2
         version: 11.3.0
+      sax:
+        specifier: ^1.4.1
+        version: 1.6.0
       zod:
         specifier: ^3.23.8
         version: 3.25.76
@@ -27,6 +30,9 @@ importers:
       '@types/node':
         specifier: ^22.7.4
         version: 22.19.19
+      '@types/sax':
+        specifier: ^1.2.7
+        version: 1.2.7
       tsx:
         specifier: ^4.19.1
         version: 4.21.0
@@ -225,6 +231,9 @@ packages:
   '@types/node@22.19.19':
     resolution: {integrity: sha512-dyh/xO2Fh5bYrfWaaqGrRQQGkNdmYw6AmaAUvYeUMNTWQtvb796ikLdmTchRmOlOiIJ1TDXfWgVx1QkUlQ6Hew==}
 
+  '@types/sax@1.2.7':
+    resolution: {integrity: sha512-rO73L89PJxeYM3s3pPPjiPgVVcymqU490g0YO5n5By0k2Erzj6tay/4lr1CHAAU4JyOWd1rpQ8bCf6cZfHU96A==}
+
   abort-controller@3.0.0:
     resolution: {integrity: sha512-h8lQ8tacZYnR3vNQTgibj+tODHI5/+l06Au2Pcriv/Gmet0eaj4TwWH41sO9wnHDiQsEj19q0drzdWdeAHtweg==}
     engines: {node: '>=6.5'}
@@ -347,6 +356,10 @@ packages:
   safe-stable-stringify@2.5.0:
     resolution: {integrity: sha512-b3rppTKm9T+PsVCBEOUR46GWI7fdOs00VKZ1+9c1EWDaDMvjQc6tUwuFyIprgGgTcWoVHSKrU8H31ZHA2e0RHA==}
     engines: {node: '>=10'}
+
+  sax@1.6.0:
+    resolution: {integrity: sha512-6R3J5M4AcbtLUdZmRv2SygeVaM7IhrLXu9BmnOGmmACak8fiUtOsYNWUS4uK7upbmHIBbLBeFeI//477BKLBzA==}
+    engines: {node: '>=11.0.0'}
 
   secure-json-parse@2.7.0:
     resolution: {integrity: sha512-6aU+Rwsezw7VR8/nyvKTx8QpWH9FrcYiXXlqC4z5d5XQBDRqtbfsRjnwGyqbi3gddNtWHuEk9OANUotL26qKUw==}
@@ -508,6 +521,10 @@ snapshots:
     dependencies:
       undici-types: 6.21.0
 
+  '@types/sax@1.2.7':
+    dependencies:
+      '@types/node': 22.19.19
+
   abort-controller@3.0.0:
     dependencies:
       event-target-shim: 5.0.1
@@ -654,6 +671,8 @@ snapshots:
   safe-buffer@5.2.1: {}
 
   safe-stable-stringify@2.5.0: {}
+
+  sax@1.6.0: {}
 
   secure-json-parse@2.7.0: {}
 
