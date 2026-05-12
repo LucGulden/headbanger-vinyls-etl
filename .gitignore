@@ -1,9 +1,23 @@
-node_modules/
-dist/
+# Secrets
 .env
+.env.local
 
-# Pipeline data (keep .gitkeep)
-data/*.json
+# Pipeline data (large + reproducible)
+data/raw/
+data/stage/
+data/final/
+data/checkpoints/
 
-# Logs
+# Node
+node_modules/
 *.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Build
+dist/
+*.tsbuildinfo
+
+# IDE
+.vscode/
+.idea/

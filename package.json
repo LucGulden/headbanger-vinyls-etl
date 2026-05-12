@@ -1,0 +1,32 @@
+{
+  "name": "headbanger-etl",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Offline ETL pipeline that seeds the HeadBanger catalogue (artists, albums, vinyls, tracks) from Discogs, MusicBrainz, Cover Art Archive and Spotify into Supabase. Runs separately from the HeadBanger application.",
+  "type": "module",
+  "engines": {
+    "node": ">=20.10.0"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "part-02": "tsx src/parts/part-02-discogs-extract.ts",
+    "part-03": "tsx src/parts/part-03-musicbrainz-extract.ts",
+    "part-04": "tsx src/parts/part-04-resolve-and-merge.ts",
+    "part-05": "tsx src/parts/part-05-fetch-covers.ts",
+    "part-06": "tsx src/parts/part-06-spotify-enrich.ts",
+    "part-07": "tsx src/parts/part-07-load-to-supabase.ts",
+    "part-08": "tsx src/parts/part-08-recurring-updates.ts"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.4",
+    "dotenv": "^16.4.5",
+    "pino": "^9.4.0",
+    "pino-pretty": "^11.2.2",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.4",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.2"
+  }
+}
